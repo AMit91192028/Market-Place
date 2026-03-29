@@ -2,6 +2,7 @@ const userModel = require('../models/users.model');
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const redis = require("../db/redis")
+
 async function registerUser(req,res){
     const{username, email,password,fullName:{firstName,lastName},role} = req.body;
 
@@ -152,7 +153,7 @@ async function addUserAddress(req,res){
 async function deleteUserAdresses(){
         const{id} = req.user;
         const{addressId} = req.params;
-          const isAddressExits = await userModel.findOne({_id:id,'addressId':addresses}) ;
+          const isAddressExits = await userModel.findOne({_id:id,'addresses._id':addresses}) ;
           if(!isAddressExits){
             return res.status(404).json({message:"Addresses is not found"})
           }
@@ -176,6 +177,7 @@ async function deleteUserAdresses(){
                 addresses:user.addresses
             })
     }
+
 async function logoutUser(req,res){
     const token = req.cookies.token;
 

@@ -3,17 +3,8 @@ const connectDB = require("./src/db/db")
 
 
 connectDB()
-
-
-
-
-
-
-
-
-
-
-
+.then(()=>{
+    
 app.listen(3000,(err)=>{
     if(err){
 
@@ -21,3 +12,15 @@ app.listen(3000,(err)=>{
 
     console.log("server is started at http://localhost:3000")
 })
+})
+
+
+
+
+
+
+
+
+
+
+
