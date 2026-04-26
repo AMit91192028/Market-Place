@@ -28,7 +28,7 @@ jest.mock('../src/model/cart.model', () => {
     return CartMock;
 });
 
-const CartModel = require('../src/modelcls/cart.model.js');
+const CartModel = require('../src/model/cart.model.js');
 
 function generateObjectId() {
     return Array.from({ length: 24 }, () => Math.floor(Math.random() * 16).toString(16)).join('');

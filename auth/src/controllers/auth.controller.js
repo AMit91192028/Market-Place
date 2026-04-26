@@ -3,6 +3,15 @@ const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const redis = require("../db/redis")
 
+function getCookieOptions() {
+    return {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 24 * 60 * 60 * 1000,
+    };
+}
+
 async function registerUser(req,res){
     const{username, email,password,fullName:{firstName,lastName},role} = req.body;
 
@@ -35,11 +44,7 @@ async function registerUser(req,res){
         role:user.role
  },process.env.JWT_SECRET,{expiresIn:'1d'})
 
-    res.cookie('token',token,{
-        httpOnly:true,
-        secure:true,
-        maxAge:24*60*60*1000 //1 day 
-    })
+    res.cookie('token', token, getCookieOptions())
 
     res.status(201).json({message:"User registered successfully",
         user:{
@@ -74,22 +79,21 @@ async function loginUser(req, res) {
                 email: user.email,
                 role: user.role
             },
-            process.env.JWT_SECRE,
+            process.env.JWT_SECRET,
             { expiresIn: '1d' }
         );
 
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: true,
-            maxAge: 24 * 60 * 60 * 1000
-        });
+        res.cookie('token', token, getCookieOptions());
 
         res.status(200).json({
             message: 'Logged in successfully',
             user: {
                 id: user._id,
                 username: user.username,
-                email: user.email
+                email: user.email,
+                fullName: user.fullName,
+                role: user.role,
+                addresses: user.addresses || [],
             }
         });
     } catch (err) {
@@ -97,13 +101,26 @@ async function loginUser(req, res) {
     }
 }
 
-async function getCurrentUser(){
+async function getCurrentUser(req, res){
+    const user = await userModel.findById(req.user.id).select('username email fullName role addresses');
+
+    if (!user) {
+        return res.status(404).json({ message: "User not found" });
+    }
+
     return res.status(200).json({
-        user: req.user
+        user: {
+            id: user._id,
+            username: user.username,
+            email: user.email,
+            fullName: user.fullName,
+            role: user.role,
+            addresses: user.addresses || [],
+        }
     });
 }
 
-async function getUserAddress(){
+async function getUserAddress(req, res){
     const {id} = req.user;
 
     const user = await userModel.findById(id).select('addresses');
@@ -150,10 +167,10 @@ async function addUserAddress(req,res){
     })
 }
 
-async function deleteUserAdresses(){
+async function deleteUserAdresses(req, res){
         const{id} = req.user;
         const{addressId} = req.params;
-          const isAddressExits = await userModel.findOne({_id:id,'addresses._id':addresses}) ;
+          const isAddressExits = await userModel.findOne({_id:id,'addresses._id':addressId}) ;
           if(!isAddressExits){
             return res.status(404).json({message:"Addresses is not found"})
           }
@@ -185,9 +202,10 @@ async function logoutUser(req,res){
         await redis.set(`blacklist:${token}`,'true','Ex',24*60*60)
     }
 
-    res.clearCookie('token',{
-        httpOnly:true,
-        secure:true,
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
     });
 
     return res.status(200).json({message:"Logged out successfully"})

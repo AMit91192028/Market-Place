@@ -60,8 +60,8 @@ const loginUserValidations=[
         if(!req.body.email && !req.body.username){
             return res.status(400).json({errors:[{msg:'Either email or username is required'}]})
         }
-    },
-    responseWithValidationErrors
+         responseWithValidationErrors(req,res,next)
+    }
 
 ]
 
@@ -93,7 +93,8 @@ const addUserAddressValidation=[
     body("isDefault")
     .optional()
     .isBoolean()
-    .withMessage("isDefault must be a boolean ")
+    .withMessage("isDefault must be a boolean "),
+    responseWithValidationErrors
    
 
 

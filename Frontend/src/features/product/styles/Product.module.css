@@ -1,0 +1,337 @@
+.page,
+.detailPage {
+  display: grid;
+  gap: 1.5rem;
+  animation: fadeRise 220ms ease;
+}
+
+.hero,
+.detailCard,
+.createCard,
+.panel,
+.sellerCard,
+.productCard,
+.heroBoard {
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 32px;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: 1.25fr 0.75fr;
+  gap: 1.5rem;
+  padding: 2rem;
+  background:
+    radial-gradient(circle at top left, rgba(15, 118, 110, 0.12), transparent 28%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(255, 247, 237, 0.92));
+}
+
+.heroContent h1,
+.sectionHeader h1,
+.detailContent h1 {
+  font-family: 'Fraunces', Georgia, serif;
+  line-height: 1.05;
+  margin: 0.85rem 0;
+}
+
+.eyebrow {
+  display: inline-flex;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(15, 118, 110, 0.12);
+  color: #0f766e;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.heroActions,
+.cardActions,
+.metricRow,
+.chipRow,
+.toolbar,
+.filterPanel,
+.sellerInlineFields,
+.panelHeader,
+.sectionHeader {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.metricCard,
+.heroCardMain,
+.heroCardAccent {
+  padding: 1rem;
+  border-radius: 24px;
+  background: rgba(15, 23, 42, 0.04);
+}
+
+.metricCard {
+  min-width: 160px;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.metricCard strong,
+.detailStats strong {
+  font-size: 1.4rem;
+}
+
+.metricCard span,
+.priceRow span,
+.detailStats span,
+.productHeader p,
+.fieldBlock small {
+  color: #64748b;
+}
+
+.heroBoard {
+  display: grid;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(15, 118, 110, 0.92));
+  color: #fff;
+}
+
+.heroCardAccent {
+  background: rgba(249, 115, 22, 0.24);
+  font-weight: 700;
+}
+
+.chip {
+  border: none;
+  padding: 0.8rem 1rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.06);
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.filterPanel label,
+.fieldBlock {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.filterPanel span,
+.fieldBlock span {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.productCard {
+  overflow: hidden;
+}
+
+.productMedia {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: #f8fafc;
+}
+
+.productMedia img,
+.detailMedia img,
+.sellerImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.productBadge,
+.stockPill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.productBadge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: rgba(15, 23, 42, 0.86);
+  color: #fff;
+}
+
+.stockPill {
+  background: rgba(15, 118, 110, 0.12);
+  color: #0f766e;
+}
+
+.productBody,
+.detailContent,
+.sellerFields,
+.createForm {
+  display: grid;
+  gap: 1rem;
+  padding: 1.3rem;
+}
+
+.productHeader {
+  display: grid;
+  gap: 1rem;
+}
+
+.productHeader h3,
+.detailContent h1,
+.sectionHeader h1 {
+  margin: 0;
+}
+
+.priceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.priceRow strong {
+  font-size: 1.45rem;
+}
+
+.primaryButton,
+.secondaryButton,
+.dangerButton {
+  border: none;
+  border-radius: 18px;
+  padding: 0.95rem 1.15rem;
+  font-weight: 700;
+}
+
+.primaryButton {
+  background: linear-gradient(135deg, #0f766e, #ea580c);
+  color: #fff;
+}
+
+.secondaryButton {
+  background: rgba(15, 23, 42, 0.06);
+  color: #0f172a;
+}
+
+.dangerButton {
+  background: rgba(185, 28, 28, 0.1);
+  color: #991b1b;
+}
+
+.successBanner,
+.errorBanner {
+  padding: 1rem 1.15rem;
+  border-radius: 22px;
+}
+
+.successBanner {
+  background: rgba(15, 118, 110, 0.09);
+  color: #0f766e;
+}
+
+.errorBanner {
+  background: rgba(185, 28, 28, 0.08);
+  color: #991b1b;
+}
+
+.cardSkeleton {
+  height: 420px;
+  border-radius: 32px;
+  background:
+    linear-gradient(90deg, rgba(226, 232, 240, 0.6), rgba(255, 255, 255, 0.95), rgba(226, 232, 240, 0.6));
+}
+
+.emptyState {
+  display: grid;
+  gap: 0.75rem;
+  place-items: center;
+  min-height: 280px;
+  padding: 2rem;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.84);
+  border-radius: 32px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.detailCard {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  overflow: hidden;
+}
+
+.detailMedia {
+  min-height: 420px;
+}
+
+.detailStats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.detailStats div {
+  padding: 1rem;
+  border-radius: 22px;
+  background: rgba(15, 23, 42, 0.04);
+  display: grid;
+  gap: 0.3rem;
+}
+
+.backLink {
+  color: #0f766e;
+  font-weight: 700;
+}
+
+.sellerGrid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.sellerCard {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  overflow: hidden;
+}
+
+.sellerImage {
+  min-height: 100%;
+  aspect-ratio: 1 / 1;
+}
+
+.createCard {
+  padding: 1.5rem;
+}
+
+@media (max-width: 1080px) {
+  .hero,
+  .detailCard,
+  .sellerCard {
+    grid-template-columns: 1fr;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .grid,
+  .detailStats {
+    grid-template-columns: 1fr;
+  }
+}

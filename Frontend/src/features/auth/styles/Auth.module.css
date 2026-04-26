@@ -1,0 +1,159 @@
+.authLayout {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+.authPanel,
+.formCard {
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 32px;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+  padding: 2rem;
+}
+
+.authPanel {
+  background:
+    radial-gradient(circle at top right, rgba(249, 115, 22, 0.14), transparent 28%),
+    linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(15, 118, 110, 0.92));
+  color: #fff;
+}
+
+.eyebrow,
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.badge {
+  background: rgba(15, 118, 110, 0.12);
+  color: #0f766e;
+}
+
+.authPanel h1,
+.formHeader h2 {
+  font-family: 'Fraunces', Georgia, serif;
+  line-height: 1.05;
+  margin: 1rem 0;
+}
+
+.authPanel h1 {
+  font-size: clamp(2.2rem, 3vw, 4rem);
+}
+
+.authPanel p,
+.formHeader p,
+.featureCard span {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.formHeader p,
+.footerCopy {
+  color: #64748b;
+}
+
+.featureList {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.featureCard {
+  display: grid;
+  gap: 0.4rem;
+  padding: 1rem;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.formHeader {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.field span {
+  font-weight: 600;
+}
+
+.field small {
+  color: #b91c1c;
+}
+
+.gridTwo {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.passwordRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.75rem;
+}
+
+.inlineButton,
+.primaryButton {
+  border: none;
+  border-radius: 18px;
+  font-weight: 700;
+}
+
+.inlineButton {
+  padding: 0.9rem 1rem;
+  background: rgba(15, 23, 42, 0.06);
+}
+
+.primaryButton {
+  padding: 1rem 1.2rem;
+  background: linear-gradient(135deg, #0f766e, #ea580c);
+  color: #fff;
+}
+
+.errorBox {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 20px;
+  background: rgba(185, 28, 28, 0.08);
+  color: #991b1b;
+}
+
+.footerCopy {
+  margin-top: 1rem;
+}
+
+.footerCopy a {
+  color: #0f766e;
+  font-weight: 700;
+}
+
+@media (max-width: 960px) {
+  .authLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .gridTwo {
+    grid-template-columns: 1fr;
+  }
+}

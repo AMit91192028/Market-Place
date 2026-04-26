@@ -20,7 +20,7 @@ const createProductValidators = [
         .isString()
         .withMessage('description must be a string')
         .trim()
-        .isLength({ max: 500 })
+        .isLength({ max: 1000 })
         .withMessage('description max length is 500 characters'),
     body('priceAmount')
         .notEmpty()
@@ -32,6 +32,10 @@ const createProductValidators = [
         .optional()
         .isIn([ 'USD', 'INR' ])
         .withMessage('priceCurrency must be USD or INR'),
+    body('stock')
+        .optional()
+        .isInt({ min: 0 })
+        .withMessage('stock must be a non-negative integer'),
     handleValidationErrors
 ];
 

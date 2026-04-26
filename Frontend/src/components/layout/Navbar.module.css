@@ -1,0 +1,247 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: blur(16px);
+}
+
+.topStrip {
+  background: linear-gradient(90deg, #0f172a, #0f766e, #ea580c);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.topStrip p {
+  margin: 0 auto;
+  max-width: 1400px;
+  padding: 0.7rem 1.5rem;
+  text-align: center;
+}
+
+.navbar {
+  background: rgba(248, 250, 252, 0.92);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+  display: grid;
+  grid-template-columns: auto minmax(280px, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  color: #0f172a;
+}
+
+.logo strong {
+  display: block;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.25rem;
+}
+
+.logo span:last-child {
+  display: block;
+  color: #475569;
+  font-size: 0.82rem;
+}
+
+.logoMark {
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #0f766e, #ea580c);
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.searchBar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.searchBar input {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  padding: 0.8rem 1rem;
+}
+
+.searchBar input:focus {
+  box-shadow: none;
+}
+
+.searchBar button,
+.primaryButton,
+.secondaryButton,
+.menuToggle {
+  border: none;
+  border-radius: 999px;
+  padding: 0.82rem 1.2rem;
+  font-weight: 700;
+}
+
+.searchBar button,
+.primaryButton {
+  background: linear-gradient(135deg, #0f766e, #ea580c);
+  color: #fff;
+  box-shadow: 0 12px 24px rgba(15, 118, 110, 0.2);
+}
+
+.secondaryButton,
+.menuToggle {
+  background: rgba(15, 23, 42, 0.06);
+  color: #0f172a;
+}
+
+.menuToggle {
+  display: none;
+}
+
+.menu {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.75rem 1rem;
+  border-radius: 999px;
+  color: #334155;
+  font-weight: 600;
+}
+
+.navLink:hover,
+.navLink[aria-current='page'] {
+  background: rgba(15, 118, 110, 0.1);
+  color: #0f766e;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: #ea580c;
+  color: #fff;
+  font-size: 0.74rem;
+}
+
+.sessionBox {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.userMeta {
+  display: grid;
+  gap: 0.15rem;
+  text-align: right;
+}
+
+.userMeta strong {
+  font-size: 0.95rem;
+}
+
+.userMeta span {
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+.userLabel {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.authButtons {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+@media (max-width: 1120px) {
+  .container {
+    grid-template-columns: 1fr auto;
+  }
+
+  .searchBar {
+    grid-column: 1 / -1;
+    order: 3;
+  }
+}
+
+@media (max-width: 900px) {
+  .container {
+    grid-template-columns: 1fr auto;
+  }
+
+  .menuToggle {
+    display: inline-flex;
+    justify-content: center;
+  }
+
+  .menu {
+    grid-column: 1 / -1;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.96);
+    border-radius: 28px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    box-shadow: 0 22px 50px rgba(15, 23, 42, 0.12);
+  }
+
+  .open {
+    display: flex;
+  }
+
+  .navLinks,
+  .authButtons,
+  .sessionBox {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .navLink,
+  .primaryButton,
+  .secondaryButton {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .userMeta {
+    text-align: center;
+  }
+}

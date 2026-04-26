@@ -7,7 +7,7 @@
 **Stack**: MongoDB Atlas, Express/Node, React (Vite + RTK Query), RabbitMQ, Redis, Razorpay.
 **Deploy**: ECR → ECS Fargate → ALB (path rules) → Target Groups.
 **Auth**: JWT (access+refresh, httpOnly), Google (Passport).
-**Security**: Helmet, CORS, CSRF (double-submit), XSS sanitize, rate limit (Redis), RBAC.
+**Security**: CORS, CSRF , XSS, rate limit (Redis), RBAC.
 **Observability**: Morgan + Pino, request-id, CloudWatch.
 
 ---

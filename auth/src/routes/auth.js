@@ -14,6 +14,7 @@ router.get('/me',authMiddleware,getCurrentUser)
 
 // GET /api/auth/
 router.get('/user/me/addresses',authMiddleware,getUserAddress)
+router.get('/users/me/addresses',authMiddleware,getUserAddress)
 
 // Update user Address
     router.post("/users/me/addresses",addUserAddressValidation, authMiddleware,addUserAddress)

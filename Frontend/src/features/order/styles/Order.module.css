@@ -1,0 +1,218 @@
+.page {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.sectionHeader,
+.checkoutLayout,
+.panel,
+.summaryPanel,
+.orderCard,
+.detailPanel,
+.emptyState {
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 32px;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+}
+
+.sectionHeader,
+.checkoutLayout,
+.detailPanel {
+  padding: 1.75rem;
+}
+
+.eyebrow {
+  display: inline-flex;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(15, 118, 110, 0.12);
+  color: #0f766e;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.sectionHeader h1,
+.detailPanel h1 {
+  margin: 0.75rem 0 0.4rem;
+  font-family: 'Fraunces', Georgia, serif;
+}
+
+.checkoutLayout {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 1.25rem;
+}
+
+.addressColumn,
+.summaryPanel,
+.panel,
+.addressForm,
+.orderItems,
+.orderGrid {
+  display: grid;
+  gap: 1rem;
+}
+
+.panel {
+  padding: 1.25rem;
+}
+
+.panelHeader,
+.orderCardHeader,
+.summaryRow,
+.cardActions,
+.inlineFields,
+.orderMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.addressList,
+.orderGrid {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.addressCard {
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 22px;
+  background: rgba(15, 23, 42, 0.03);
+  padding: 1rem;
+  text-align: left;
+}
+
+.addressCardActive {
+  border-color: rgba(15, 118, 110, 0.45);
+  background: rgba(15, 118, 110, 0.08);
+}
+
+.summaryPanel {
+  padding: 1.5rem;
+  align-content: start;
+}
+
+.orderItem,
+.lineItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.orderItem img {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  object-fit: cover;
+}
+
+.orderItem div {
+  flex: 1;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.summaryRow {
+  color: #475569;
+}
+
+.totalRow {
+  padding-top: 1rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+  color: #0f172a;
+}
+
+.orderCard,
+.detailPanel {
+  display: grid;
+  gap: 1rem;
+}
+
+.orderCard {
+  padding: 1.25rem;
+}
+
+.orderMeta,
+.orderAddress {
+  color: #64748b;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(15, 118, 110, 0.12);
+  color: #0f766e;
+  font-weight: 700;
+}
+
+.addressBlock {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1rem;
+  border-radius: 24px;
+  background: rgba(15, 23, 42, 0.04);
+}
+
+.primaryButton,
+.secondaryButton,
+.ghostButton,
+.dangerButton {
+  border: none;
+  border-radius: 18px;
+  padding: 0.95rem 1.15rem;
+  font-weight: 700;
+}
+
+.primaryButton {
+  background: linear-gradient(135deg, #0f766e, #ea580c);
+  color: #fff;
+}
+
+.secondaryButton,
+.ghostButton {
+  background: rgba(15, 23, 42, 0.06);
+  color: #0f172a;
+}
+
+.dangerButton {
+  background: rgba(185, 28, 28, 0.1);
+  color: #991b1b;
+}
+
+.successBanner,
+.errorBanner {
+  padding: 1rem 1.15rem;
+  border-radius: 22px;
+}
+
+.successBanner {
+  background: rgba(15, 118, 110, 0.09);
+  color: #0f766e;
+}
+
+.errorBanner {
+  background: rgba(185, 28, 28, 0.08);
+  color: #991b1b;
+}
+
+.emptyState {
+  display: grid;
+  gap: 0.75rem;
+  place-items: center;
+  min-height: 280px;
+  padding: 2rem;
+  text-align: center;
+}
+
+@media (max-width: 980px) {
+  .checkoutLayout {
+    grid-template-columns: 1fr;
+  }
+}

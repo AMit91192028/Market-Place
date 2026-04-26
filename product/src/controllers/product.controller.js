@@ -1,4 +1,4 @@
-const { default: mongoose } = require('mongoose');
+const  mongoose  = require('mongoose');
 const productModel = require('../model/product.model')
 const {uploadImage} = require('../services/imagekit.service');
 // const mongoose = require('mongoose');
@@ -10,7 +10,7 @@ const {uploadImage} = require('../services/imagekit.service');
 async function createProduct(req, res) {
     console.log('createProduct called');
     try {
-        const { title, description, priceAmount, priceCurrency = 'INR' } = req.body;
+        const { title, description, priceAmount, priceCurrency = 'INR', stock = 0 } = req.body;
 
         const seller = req.user.id; // Extract seller from authenticated user
 
@@ -22,14 +22,14 @@ async function createProduct(req, res) {
         const images = await Promise.all((req.files || []).map(file => uploadImage({ buffer: file.buffer })));
 
 
-        const product = await productModel.create({ title, description, price, seller, images });
-
-        // await publishToQueue("PRODUCT_SELLER_DASHBOARD.PRODUCT_CREATED", product);
-        // await publishToQueue("PRODUCT_NOTIFICATION.PRODUCT_CREATED", {
-        //     email: req.user.email,
-        //     productId: product._id,
-        //     sellerId: seller
-        // });
+        const product = await productModel.create({
+            title,
+            description,
+            price,
+            seller,
+            images,
+            stock: Number(stock) || 0,
+        });
 
         return res.status(201).json({
             message: 'Product created',
@@ -50,7 +50,7 @@ async function getProducts(req,res){
             filter.$text = {$search:q}
         }
         if(minprice){
-            filter['price.amount'] = {...filter['price.amount'],$lte:Number(minprice)}
+            filter['price.amount'] = {...filter['price.amount'],$gte:Number(minprice)}
         }
 
         if(maxprice){
@@ -93,7 +93,7 @@ async function updateProduct(req,res){
         return res.status(403).json({message:'Forbidden: Not owner'})
     }
 
-    const allowedUpdates = ['title','description','price'];
+    const allowedUpdates = ['title','description','price', 'stock'];
        for (const key of Object.keys(req.body)) {
         if (allowedUpdates.includes(key)) {
             if (key === 'price' && typeof req.body.price === 'object') {
@@ -103,6 +103,8 @@ async function updateProduct(req,res){
                 if (req.body.price.currency !== undefined) {
                     product.price.currency = req.body.price.currency;
                 }
+            } else if (key === 'stock') {
+                product.stock = Number(req.body.stock);
             } else {
                 product[ key ] = req.body[ key ];
             }
