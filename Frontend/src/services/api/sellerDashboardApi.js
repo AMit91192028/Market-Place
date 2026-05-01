@@ -7,7 +7,7 @@ export const getSellerMetrics = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await sellerDashboardClient.get('/metrics')
-      return response.data
+      return response.data || {}
     } catch (error) {
       return rejectWithValue(getApiErrorMessage(error, 'Failed to fetch seller metrics'))
     }
@@ -33,7 +33,7 @@ export const getSellerDashboardProducts = createAsyncThunk(
       const response = await sellerDashboardClient.get('/products')
       return Array.isArray(response.data) ? response.data : []
     } catch (error) {
-      return rejectWithValue(getApiErrorMessage(error, 'Failed to fetch seller catalog snapshot'))
+      return rejectWithValue(getApiErrorMessage(error, 'Failed to fetch seller catalog'))
     }
   }
 )

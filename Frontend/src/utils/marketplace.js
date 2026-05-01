@@ -63,18 +63,10 @@ export function getProductImage(product) {
 }
 
 export function getProductDescription(description) {
-  if (Array.isArray(description)) {
-    return description.filter(Boolean).join('\n')
-  }
-
-  return description || ''
+  return String(description || '')
 }
 
 export function normalizeProductDescriptionInput(value) {
-  if (Array.isArray(value)) {
-    return value.map((item) => String(item || '').trim()).filter(Boolean).join('\n')
-  }
-
   return String(value || '')
     .split(/\r?\n/)
     .map((line) => line.replace(/^\s*[-*]\s*/, '').trim())
@@ -83,7 +75,7 @@ export function normalizeProductDescriptionInput(value) {
 }
 
 export function toProductDescriptionTextarea(value) {
-  return getProductDescription(value)
+  return String(value || '')
 }
 
 export function formatProductCategory(category) {

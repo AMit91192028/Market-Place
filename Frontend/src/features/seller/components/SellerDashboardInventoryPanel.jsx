@@ -2,31 +2,33 @@ import { getProductImage } from '../../../utils/marketplace'
 
 export default function SellerDashboardInventoryPanel({
   styles,
-  productLoading,
   sellerProducts,
   drafts,
+  productLoading,
+  savingProductId,
+  deletingProductId,
   updateDraft,
   handleSave,
   handleDelete,
-  savingProductId,
-  deletingProductId,
   getProductDescriptionText,
+  formatCurrency,
+  formatProductCategory,
 }) {
   return (
     <article className={styles.panel} id="inventory-editor">
       <div className={styles.panelHeader}>
         <div>
-          <span className={styles.panelLabel}>Inventory editor</span>
-          <h2>Live product management</h2>
+          <span className={styles.panelEyebrow}>Product Service</span>
+          <h2>Manage live inventory</h2>
         </div>
         <span className={styles.panelMeta}>
-          {productLoading ? 'Refreshing inventory...' : `${sellerProducts.length} editable listings`}
+          {productLoading ? 'Loading inventory...' : `${sellerProducts.length} editable listings`}
         </span>
       </div>
 
       <div className={styles.inventoryGrid}>
         {productLoading
-          ? Array.from({ length: 2 }).map((_, index) => <article key={index} className={styles.inventorySkeleton} />)
+          ? Array.from({ length: 2 }).map((_, index) => <div key={index} className={styles.loadingCard} />)
           : sellerProducts.map((product) => {
               const draft = drafts[product._id] || {
                 title: product.title,
@@ -40,12 +42,19 @@ export default function SellerDashboardInventoryPanel({
                 <article key={product._id} className={styles.inventoryCard}>
                   <div className={styles.inventoryMedia}>
                     <img src={getProductImage(product)} alt={product.title} />
-                    <span className={styles.inventoryBadge}>
-                      {Number(product.stock || 0) > 0 ? `${product.stock} in stock` : 'Out of stock'}
-                    </span>
                   </div>
 
                   <div className={styles.inventoryBody}>
+                    <div className={styles.inventoryTitleRow}>
+                      <div>
+                        <strong>{product.title}</strong>
+                        <span>{formatProductCategory(product.category)}</span>
+                      </div>
+                      <span className={Number(product.stock || 0) > 0 ? styles.liveBadge : styles.outBadge}>
+                        {Number(product.stock || 0) > 0 ? `${product.stock} in stock` : 'Out of stock'}
+                      </span>
+                    </div>
+
                     <label className={styles.fieldBlock}>
                       <span>Title</span>
                       <input
@@ -67,6 +76,7 @@ export default function SellerDashboardInventoryPanel({
                     <label className={styles.fieldBlock}>
                       <span>Description</span>
                       <textarea
+                        rows="4"
                         value={draft.description || ''}
                         onChange={(event) => updateDraft(product._id, 'description', event.target.value)}
                       />
@@ -94,21 +104,26 @@ export default function SellerDashboardInventoryPanel({
                       </label>
                     </div>
 
-                    <div className={styles.cardActions}>
-                      <button
-                        className={styles.primaryButton}
-                        onClick={() => handleSave(product._id)}
-                        disabled={savingProductId === product._id}
-                      >
-                        {savingProductId === product._id ? 'Saving...' : 'Save changes'}
-                      </button>
-                      <button
-                        className={styles.dangerButton}
-                        onClick={() => handleDelete(product._id)}
-                        disabled={deletingProductId === product._id}
-                      >
-                        {deletingProductId === product._id ? 'Deleting...' : 'Delete'}
-                      </button>
+                    <div className={styles.inventoryFooter}>
+                      <strong>{formatCurrency(product.price?.amount, product.price?.currency || 'INR')}</strong>
+                      <div className={styles.cardActions}>
+                        <button
+                          type="button"
+                          className={styles.primaryButton}
+                          disabled={savingProductId === product._id}
+                          onClick={() => handleSave(product._id)}
+                        >
+                          {savingProductId === product._id ? 'Saving...' : 'Save changes'}
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.dangerButton}
+                          disabled={deletingProductId === product._id}
+                          onClick={() => handleDelete(product._id)}
+                        >
+                          {deletingProductId === product._id ? 'Deleting...' : 'Delete'}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </article>
@@ -117,9 +132,9 @@ export default function SellerDashboardInventoryPanel({
       </div>
 
       {!productLoading && sellerProducts.length === 0 ? (
-        <div className={styles.emptyPanel}>
+        <div className={styles.emptyState}>
           <h3>No seller products yet</h3>
-          <p>Create your first listing to activate seller metrics and live inventory controls.</p>
+          <p>Create your first listing to populate product service inventory here.</p>
         </div>
       ) : null}
     </article>

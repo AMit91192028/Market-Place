@@ -15,55 +15,44 @@ import {
 import {
   formatCurrency,
   formatDateTime,
-  normalizeProductDescriptionInput,
   formatProductCategory,
   formatStatusLabel,
   getOrderValue,
   getProductImage,
   getUserDisplayName,
+  normalizeProductDescriptionInput,
+  toProductDescriptionTextarea,
 } from '../../../utils/marketplace'
 import SellerDashboardCreateProductPanel from '../components/SellerDashboardCreateProductPanel'
 import SellerDashboardInventoryPanel from '../components/SellerDashboardInventoryPanel'
-import SellerDashboardRecentOrdersPanel from '../components/SellerDashboardRecentOrdersPanel'
+import SellerDashboardOrdersPanel from '../components/SellerDashboardOrdersPanel'
 import styles from '../styles/SellerDashboard.module.css'
 
 const LIVE_REFRESH_MS = 30000
-const SELLER_ORDER_FLOW = ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED']
 
 function getPaymentBadgeClass(status, cssModule) {
   switch (status) {
     case 'COMPLETED':
-      return cssModule.statusSuccess
+      return cssModule.successBadge
     case 'PENDING':
-      return cssModule.statusPending
+      return cssModule.pendingBadge
     case 'FAILED':
-      return cssModule.statusFailed
+      return cssModule.failedBadge
     default:
-      return cssModule.statusMuted
+      return cssModule.neutralBadge
   }
-}
-
-function getProductDescriptionText(description) {
-  return typeof description === 'string' ? description : description || ''
 }
 
 function hasRefreshFailures(results = []) {
   return results.some((result) => result.status === 'rejected')
 }
 
+function getProductDescriptionText(description) {
+  return toProductDescriptionTextarea(description)
+}
+
 export default function SellerDashboardPage() {
   const dispatch = useDispatch()
-  const { user } = useSelector((state) => state.auth)
-  const { sellerProducts, isLoading: productLoading, error: productError } = useSelector((state) => state.product)
-  const {
-    metrics,
-    orders,
-    products: dashboardProducts,
-    isLoadingMetrics,
-    isLoadingOrders,
-    isLoadingProducts,
-    error,
-  } = useSelector((state) => state.sellerDashboard)
   const [searchParams, setSearchParams] = useSearchParams()
   const [drafts, setDrafts] = useState({})
   const [message, setMessage] = useState('')
@@ -71,8 +60,22 @@ export default function SellerDashboardPage() {
   const [isPublishing, setIsPublishing] = useState(false)
   const [savingProductId, setSavingProductId] = useState('')
   const [deletingProductId, setDeletingProductId] = useState('')
+  const [localActionError, setLocalActionError] = useState('')
+
+  const { user } = useSelector((state) => state.auth)
+  const { sellerProducts, isLoading: productLoading, error: productError } = useSelector((state) => state.product)
+  const {
+    metrics,
+    orders,
+    products: mirroredProducts,
+    isLoadingMetrics,
+    isLoadingOrders,
+    isLoadingProducts,
+    error: sellerDashboardError,
+  } = useSelector((state) => state.sellerDashboard)
 
   const isComposerOpen = searchParams.get('composer') === '1'
+
   const refreshDashboard = useEffectEvent(async () => {
     const results = await Promise.allSettled([
       dispatch(getSellerMetrics()).unwrap(),
@@ -92,44 +95,35 @@ export default function SellerDashboardPage() {
       void refreshDashboard()
     }, LIVE_REFRESH_MS)
 
-    return () => {
-      window.clearInterval(intervalId)
-    }
+    return () => window.clearInterval(intervalId)
   }, [refreshDashboard])
 
   const productNameById = useMemo(() => {
-    return [...dashboardProducts, ...sellerProducts].reduce((result, product) => {
+    return [...mirroredProducts, ...sellerProducts].reduce((result, product) => {
       result[String(product._id)] = product.title
       return result
     }, {})
-  }, [dashboardProducts, sellerProducts])
+  }, [mirroredProducts, sellerProducts])
 
   const inventoryMetrics = useMemo(() => {
     return {
       listings: sellerProducts.length,
-      stock: sellerProducts.reduce((sum, product) => sum + Number(product.stock || 0), 0),
+      stockUnits: sellerProducts.reduce((sum, product) => sum + Number(product.stock || 0), 0),
       stockValue: sellerProducts.reduce(
         (sum, product) => sum + Number(product.stock || 0) * Number(product.price?.amount || 0),
         0
       ),
-      lowStock: sellerProducts.filter((product) => Number(product.stock || 0) > 0 && Number(product.stock || 0) <= 5)
-        .length,
       outOfStock: sellerProducts.filter((product) => Number(product.stock || 0) <= 0).length,
     }
   }, [sellerProducts])
 
-  const statusSummary = useMemo(() => {
-    return SELLER_ORDER_FLOW.map((status) => ({
-      status,
-      count: orders.filter((order) => order.status === status).length,
-    })).filter((item) => item.count > 0)
-  }, [orders])
+  const recentMirroredProducts = useMemo(() => {
+    const source = mirroredProducts.length ? mirroredProducts : sellerProducts
+    return source.slice(0, 4)
+  }, [mirroredProducts, sellerProducts])
 
-  const recentCatalog = useMemo(() => {
-    return (dashboardProducts.length ? dashboardProducts : sellerProducts).slice(0, 4)
-  }, [dashboardProducts, sellerProducts])
   const isRefreshing = isLoadingMetrics || isLoadingOrders || isLoadingProducts || productLoading
-  const dashboardError = error || productError
+  const dashboardError = localActionError || sellerDashboardError || productError
 
   function setComposerOpen(open) {
     const nextParams = new URLSearchParams(searchParams)
@@ -152,18 +146,19 @@ export default function SellerDashboardPage() {
       },
     }))
   }
- 
+
   async function handleCreateSubmit(values) {
     setIsPublishing(true)
+    setLocalActionError('')
     setMessage('')
 
     const formData = new FormData()
     formData.append('title', String(values.title || '').trim())
     formData.append('category', String(values.category || '').trim())
+    formData.append('description', normalizeProductDescriptionInput(values.description))
     formData.append('priceAmount', String(values.priceAmount ?? ''))
     formData.append('priceCurrency', String(values.priceCurrency || 'INR'))
     formData.append('stock', String(values.stock ?? 0))
-    formData.append('description', normalizeProductDescriptionInput(values.description))
 
     Array.from(values.images || []).forEach((file) => {
       formData.append('images', file)
@@ -171,17 +166,17 @@ export default function SellerDashboardPage() {
 
     try {
       const createdProduct = await dispatch(createProduct(formData)).unwrap()
-      const createdLabel = createdProduct?.title || 'Product'
+      const createdTitle = createdProduct?.title || 'Product'
 
-      setMessage(`${createdLabel} created successfully.`)
+      setMessage(`${createdTitle} created successfully.`)
       setComposerOpen(false)
-      void refreshDashboard().then((refreshResults) => {
-        if (hasRefreshFailures(refreshResults)) {
-          setMessage(`${createdLabel} created successfully. Some dashboard panels are still refreshing.`)
+      void refreshDashboard().then((results) => {
+        if (hasRefreshFailures(results)) {
+          setMessage(`${createdTitle} created successfully. Some dashboard cards are still refreshing.`)
         }
       })
-    } catch (createError) {
-      setMessage(createError || 'Unable to create this product.')
+    } catch (error) {
+      setLocalActionError(error || 'Unable to create product.')
     } finally {
       setIsPublishing(false)
     }
@@ -198,32 +193,30 @@ export default function SellerDashboardPage() {
     }
 
     setSavingProductId(productId)
+    setLocalActionError('')
+    setMessage('')
 
     try {
       await dispatch(
         updateProduct({
           productId,
           data: {
-            title: draft.title,
-            category: draft.category,
+            title: String(draft.title || '').trim(),
+            category: String(draft.category || '').trim(),
             description: normalizeProductDescriptionInput(draft.description),
-            stock: Number(draft.stock),
+            stock: Number(draft.stock || 0),
             price: {
-              amount: Number(draft.priceAmount),
-              currency: 'INR',
+              amount: Number(draft.priceAmount || 0),
+              currency: sourceProduct?.price?.currency || 'INR',
             },
           },
         })
       ).unwrap()
 
-      const refreshResults = await refreshDashboard()
-      setMessage(
-        hasRefreshFailures(refreshResults)
-          ? 'Inventory updated, but one or more dashboard panels are still refreshing.'
-          : 'Inventory updated and seller dashboard refreshed.'
-      )
-    } catch (updateError) {
-      setMessage(updateError || 'Unable to update this product.')
+      setMessage('Product updated successfully.')
+      void refreshDashboard()
+    } catch (error) {
+      setLocalActionError(error || 'Unable to update product.')
     } finally {
       setSavingProductId('')
     }
@@ -231,17 +224,15 @@ export default function SellerDashboardPage() {
 
   async function handleDelete(productId) {
     setDeletingProductId(productId)
+    setLocalActionError('')
+    setMessage('')
 
     try {
       await dispatch(deleteProduct(productId)).unwrap()
-      const refreshResults = await refreshDashboard()
-      setMessage(
-        hasRefreshFailures(refreshResults)
-          ? 'Product deleted, but one or more dashboard panels are still refreshing.'
-          : 'Product deleted and seller dashboard refreshed.'
-      )
-    } catch (deleteError) {
-      setMessage(deleteError || 'Unable to delete this product.')
+      setMessage('Product deleted successfully.')
+      void refreshDashboard()
+    } catch (error) {
+      setLocalActionError(error || 'Unable to delete product.')
     } finally {
       setDeletingProductId('')
     }
@@ -249,53 +240,49 @@ export default function SellerDashboardPage() {
 
   return (
     <section className={styles.page}>
-      <div className={styles.hero}>
+      <section className={styles.hero}>
         <div className={styles.heroContent}>
-          <span className={styles.eyebrow}>Seller operations</span>
-          <h1>Track your storefront, live orders, and inventory from one seller-first workspace.</h1>
+          <span className={styles.eyebrow}>Seller Workspace</span>
+          <h1>Run storefront operations with seller-dashboard and product services together.</h1>
           <p>
-            This view pulls seller-scoped metrics, seller orders, and your mirrored catalog so the
-            workspace stays focused on the business you own.
+            This view reads seller metrics, orders, and mirrored catalog data from the seller-dashboard
+            service while product creation and inventory changes go straight to the product service.
           </p>
 
           <div className={styles.heroActions}>
-            <button
-              type="button"
-              className={styles.primaryButton}
-              onClick={() => setComposerOpen(!isComposerOpen)}
-            >
-              {isComposerOpen ? 'Close product form' : 'Launch new listing'}
+            <button type="button" className={styles.primaryButton} onClick={() => setComposerOpen(!isComposerOpen)}>
+              {isComposerOpen ? 'Close product form' : 'Create new product'}
             </button>
             <a href="#inventory-editor" className={styles.secondaryButton}>
-              Jump to inventory
+              Manage inventory
             </a>
           </div>
 
           <div className={styles.metricStrip}>
             <div className={styles.metricPill}>
               <strong>{inventoryMetrics.listings}</strong>
-              <span>Active seller listings</span>
+              <span>Active product-service listings</span>
             </div>
             <div className={styles.metricPill}>
-              <strong>{inventoryMetrics.lowStock}</strong>
-              <span>Low-stock alerts</span>
+              <strong>{metrics.totalOrders}</strong>
+              <span>Orders from seller-dashboard</span>
             </div>
             <div className={styles.metricPill}>
               <strong>{user?.email || 'seller@marketplace'}</strong>
-              <span>Logged-in seller account</span>
+              <span>Seller account in session</span>
             </div>
           </div>
         </div>
 
         <div className={styles.heroPanel}>
           <div className={styles.panelHeaderCompact}>
-            <span className={styles.panelLabel}>Live snapshot</span>
-            <span className={styles.liveChip}>{isRefreshing ? 'Refreshing...' : 'Auto-refresh 30s'}</span>
+            <span className={styles.panelEyebrow}>Live Snapshot</span>
+            <span className={styles.liveChip}>{isRefreshing ? 'Refreshing...' : 'Auto-refresh every 30s'}</span>
           </div>
 
-          <div className={styles.heroHighlight}>
+          <div className={styles.heroRevenue}>
             <strong>{formatCurrency(metrics.revenue)}</strong>
-            <span>Revenue ready from paid or fulfilled seller orders</span>
+            <span>Revenue recognized from paid or fulfilled seller orders</span>
           </div>
 
           <div className={styles.heroGrid}>
@@ -304,29 +291,27 @@ export default function SellerDashboardPage() {
               <span>Units sold</span>
             </div>
             <div className={styles.heroTile}>
-              <strong>{metrics.totalOrders}</strong>
-              <span>Orders received</span>
-            </div>
-            <div className={styles.heroTile}>
               <strong>{metrics.pendingOrders}</strong>
-              <span>Orders awaiting action</span>
+              <span>Pending orders</span>
             </div>
             <div className={styles.heroTile}>
-              <strong>{inventoryMetrics.stock}</strong>
+              <strong>{inventoryMetrics.stockUnits}</strong>
               <span>Units in stock</span>
+            </div>
+            <div className={styles.heroTile}>
+              <strong>{inventoryMetrics.outOfStock}</strong>
+              <span>Out of stock</span>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       <div className={styles.liveBar}>
         <div className={styles.liveIndicator}>
           <span className={styles.liveDot} />
-          <strong>Seller feed is live</strong>
+          <strong>Seller services connected</strong>
         </div>
-        <span>
-          {lastUpdatedAt ? `Last synced ${formatDateTime(lastUpdatedAt)}` : 'Preparing seller snapshot...'}
-        </span>
+        <span>{lastUpdatedAt ? `Last synced ${formatDateTime(lastUpdatedAt)}` : 'Preparing seller snapshot...'}</span>
       </div>
 
       {message ? <div className={styles.successBanner}>{message}</div> : null}
@@ -335,110 +320,114 @@ export default function SellerDashboardPage() {
       {isComposerOpen ? (
         <SellerDashboardCreateProductPanel
           styles={styles}
-          handleCreateSubmit={handleCreateSubmit}
+          onSubmit={handleCreateSubmit}
           isPublishing={isPublishing}
-          setComposerOpen={setComposerOpen}
+          onCancel={() => setComposerOpen(false)}
         />
       ) : null}
 
       <div className={styles.overviewGrid}>
         <article className={styles.overviewCard}>
-          <span>Revenue</span>
-          <strong>{isLoadingMetrics ? 'Refreshing...' : formatCurrency(metrics.revenue)}</strong>
-          <p>Recognized from seller orders that are paid or already moving through fulfillment.</p>
+          <span>Seller revenue</span>
+          <strong>{formatCurrency(metrics.revenue)}</strong>
+          <p>Read from seller-dashboard metrics.</p>
         </article>
         <article className={styles.overviewCard}>
           <span>Units sold</span>
-          <strong>{isLoadingMetrics ? 'Refreshing...' : metrics.sales}</strong>
-          <p>Tracked only from order items that belong to your storefront.</p>
+          <strong>{metrics.sales}</strong>
+          <p>Calculated from orders containing your products.</p>
         </article>
         <article className={styles.overviewCard}>
           <span>Inventory value</span>
           <strong>{formatCurrency(inventoryMetrics.stockValue)}</strong>
-          <p>Current value of the stock you still have available to sell.</p>
+          <p>Derived from live product-service inventory.</p>
         </article>
         <article className={styles.overviewCard}>
-          <span>Stock alerts</span>
-          <strong>
-            {inventoryMetrics.lowStock} low / {inventoryMetrics.outOfStock} out
-          </strong>
-          <p>Use the live editor below to restock, reprice, or retire listings quickly.</p>
+          <span>Paid orders</span>
+          <strong>{metrics.paidOrders}</strong>
+          <p>Orders with completed payments in seller-dashboard.</p>
         </article>
       </div>
 
       <div className={styles.contentGrid}>
-        <SellerDashboardRecentOrdersPanel
+        <SellerDashboardOrdersPanel
           styles={styles}
-          isLoadingOrders={isLoadingOrders}
           orders={orders}
-          statusSummary={statusSummary}
+          isLoadingOrders={isLoadingOrders}
           formatStatusLabel={formatStatusLabel}
-          getUserDisplayName={getUserDisplayName}
-          getPaymentBadgeClass={getPaymentBadgeClass}
+          formatDateTime={formatDateTime}
           formatCurrency={formatCurrency}
           getOrderValue={getOrderValue}
-          formatDateTime={formatDateTime}
+          getUserDisplayName={getUserDisplayName}
+          getPaymentBadgeClass={getPaymentBadgeClass}
           productNameById={productNameById}
         />
 
         <article className={styles.panel}>
           <div className={styles.panelHeader}>
             <div>
-              <span className={styles.panelLabel}>Catalog focus</span>
-              <h2>Top sellers and live listings</h2>
+              <span className={styles.panelEyebrow}>Mirrored Catalog</span>
+              <h2>Seller-dashboard service product mirror</h2>
             </div>
             <span className={styles.panelMeta}>
-              {isLoadingProducts ? 'Refreshing catalog...' : `${dashboardProducts.length} mirrored listings`}
+              {isLoadingProducts ? 'Loading mirrored products...' : `${mirroredProducts.length} mirrored listings`}
             </span>
           </div>
 
           <div className={styles.topList}>
-            {isLoadingMetrics
-              ? Array.from({ length: 3 }).map((_, index) => <div key={index} className={styles.topSkeleton} />)
-              : metrics.topProducts?.map((product) => (
-                  <div key={product.id} className={styles.topRow}>
-                    <div>
-                      <strong>{product.title}</strong>
-                      <span>Best-selling seller item</span>
-                    </div>
-                    <span className={styles.topBadge}>{product.sold} sold</span>
+            {metrics.topProducts?.length ? (
+              metrics.topProducts.map((product) => (
+                <div key={product.id} className={styles.topRow}>
+                  <div>
+                    <strong>{product.title}</strong>
+                    <span>Best-performing seller item</span>
                   </div>
-                ))}
-
-            {!isLoadingMetrics && (!metrics.topProducts || metrics.topProducts.length === 0) ? (
-              <div className={styles.emptyPanel}>
-                <h3>No top-product data yet</h3>
-                <p>As soon as orders begin clearing, your best performers will show up here.</p>
+                  <span className={styles.topBadge}>{product.sold} sold</span>
+                </div>
+              ))
+            ) : (
+              <div className={styles.emptyStateCompact}>
+                <strong>No top products yet</strong>
+                <span>Top sellers will appear here after product-linked orders are created.</span>
               </div>
-            ) : null}
+            )}
           </div>
 
-          <div className={styles.syncGrid}>
-            {recentCatalog.map((product) => (
-              <div key={product._id} className={styles.syncCard}>
+          <div className={styles.catalogPreviewGrid}>
+            {recentMirroredProducts.map((product) => (
+              <article key={product._id} className={styles.previewCard}>
                 <img src={getProductImage(product)} alt={product.title} />
                 <div>
                   <strong>{product.title}</strong>
                   <span>{formatProductCategory(product.category)}</span>
                   <span>{formatCurrency(product.price?.amount, product.price?.currency || 'INR')}</span>
                 </div>
-              </div>
+              </article>
             ))}
           </div>
+
+          {!isLoadingProducts && recentMirroredProducts.length === 0 ? (
+            <div className={styles.emptyState}>
+              <h3>No mirrored products yet</h3>
+              <p>Product events from the product service will surface here through seller-dashboard.</p>
+            </div>
+          ) : null}
         </article>
       </div>
 
       <SellerDashboardInventoryPanel
         styles={styles}
-        productLoading={productLoading}
         sellerProducts={sellerProducts}
         drafts={drafts}
+        productLoading={productLoading}
+        savingProductId={savingProductId}
+        deletingProductId={deletingProductId}
         updateDraft={updateDraft}
         handleSave={handleSave}
         handleDelete={handleDelete}
-        savingProductId={savingProductId}
-        deletingProductId={deletingProductId}
         getProductDescriptionText={getProductDescriptionText}
+        formatCurrency={formatCurrency}
+        formatProductCategory={formatProductCategory}
       />
     </section>
   )

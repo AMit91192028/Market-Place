@@ -1,216 +1,219 @@
 .page {
   display: grid;
   gap: 1.5rem;
-  animation: fadeRise 220ms ease;
+  animation: fadeIn 220ms ease;
 }
 
 .hero,
-.heroPanel,
-.overviewCard,
 .panel,
-.orderCard,
-.inventoryCard,
-.syncCard,
-.emptyPanel,
-.chartCard,
-.liveBar {
+.overviewCard,
+.previewCard,
+.feedCard,
+.inventoryCard {
   background: #ffffff;
-  border: 1px solid rgba(15, 23, 42, 0.1);
-  border-radius: 22px;
-  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 24px;
+  box-shadow: 0 14px 36px rgba(15, 23, 42, 0.08);
 }
 
 .hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.18fr) minmax(340px, 0.82fr);
-  gap: 1.25rem;
+  grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.9fr);
+  gap: 1.5rem;
   padding: 1.75rem;
   background:
-    radial-gradient(circle at top left, rgba(96, 165, 250, 0.16), transparent 30%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98));
+    radial-gradient(circle at top right, rgba(56, 189, 248, 0.12), transparent 26%),
+    linear-gradient(180deg, #ffffff, #f8fbff);
 }
 
 .heroContent,
 .heroPanel,
 .overviewCard,
 .panel,
-.inventoryBody,
-.topList,
-.orderList,
-.analyticsPanel {
+.previewCard,
+.feedCard,
+.inventoryBody {
   display: grid;
   gap: 1rem;
 }
 
+.eyebrow,
+.panelEyebrow,
+.liveChip,
+.metricPill span,
+.topBadge,
+.itemChip,
+.neutralBadge,
+.pendingBadge,
+.successBadge,
+.failedBadge,
+.liveBadge,
+.outBadge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.eyebrow,
+.panelEyebrow {
+  padding: 0.45rem 0.8rem;
+  background: rgba(14, 116, 144, 0.08);
+  color: #0f766e;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
 .heroContent h1,
-.panelHeader h2,
-.emptyPanel h3 {
+.panel h2,
+.overviewCard strong {
   margin: 0;
-  font-family: 'Inter', 'Segoe UI', sans-serif;
-  font-weight: 800;
+}
+
+.heroContent h1 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 1.02;
   color: #0f172a;
 }
 
 .heroContent p,
+.heroRevenue span,
 .overviewCard p,
-.emptyPanel p,
 .panelMeta,
-.topRow span,
-.heroHighlight span,
-.metricPill span,
-.syncCard span,
-.orderHeader span,
-.orderMeta span,
-.liveBar span,
-.chartHeading span,
-.chartLabels span,
-.stockBarItem span {
+.feedHeader span,
+.feedMeta span,
+.previewCard span,
+.inventoryTitleRow span,
+.emptyState p,
+.emptyStateCompact span,
+.fieldBlock small {
   color: #64748b;
-}
-
-.eyebrow,
-.panelLabel,
-.statusBadge,
-.inventoryBadge,
-.topBadge,
-.liveChip,
-.summaryChip {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-}
-
-.eyebrow {
-  width: fit-content;
-  padding: 0.45rem 0.85rem;
-  background: rgba(37, 99, 235, 0.12);
-  color: #1d4ed8;
-  text-transform: uppercase;
-}
-
-.panelLabel {
-  width: fit-content;
-  padding: 0.35rem 0.75rem;
-  background: rgba(15, 23, 42, 0.06);
-  color: #0f172a;
-  text-transform: uppercase;
 }
 
 .heroActions,
 .metricStrip,
+.heroGrid,
+.overviewGrid,
+.contentGrid,
+.inlineFields,
+.cardActions,
 .panelHeader,
 .panelHeaderCompact,
-.orderHeader,
-.badgeStack,
-.orderMeta,
-.inlineFields,
-.cardActions {
+.feedHeader,
+.feedMeta,
+.badgeRow,
+.inventoryTitleRow,
+.inventoryFooter {
   display: flex;
   gap: 1rem;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
 }
 
-.panelHeaderCompact {
-  justify-content: space-between;
-  align-items: flex-start;
+.metricStrip,
+.heroGrid,
+.overviewGrid,
+.contentGrid,
+.catalogPreviewGrid,
+.inventoryGrid,
+.feedList,
+.topList,
+.createForm {
+  display: grid;
+  gap: 1rem;
 }
 
 .metricStrip {
-  margin-top: 0.5rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .metricPill,
 .heroTile,
-.overviewCard,
-.topRow,
-.emptyPanel,
-.chartCard {
-  padding: 1rem;
-}
-
-.metricPill {
-  min-width: 160px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.84);
-  border: 1px solid rgba(148, 163, 184, 0.16);
-  display: grid;
-  gap: 0.35rem;
-}
-
-.heroTile {
-  min-width: 150px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(191, 219, 254, 0.45);
-  display: grid;
-  gap: 0.35rem;
+.overviewCard {
+  padding: 1rem 1.1rem;
+  border-radius: 20px;
+  background: rgba(15, 23, 42, 0.04);
 }
 
 .metricPill strong,
-.heroHighlight strong,
 .heroTile strong,
-.overviewCard strong,
-.topRow strong,
-.syncCard strong,
-.orderMeta strong,
-.chartHeading strong,
-.stockBarItem strong {
-  font-size: 1.2rem;
-}
-
-.metricPill strong,
-.heroTile strong {
+.heroRevenue strong,
+.overviewCard strong {
+  font-size: 1.4rem;
   color: #0f172a;
 }
 
 .heroPanel {
   padding: 1.5rem;
-  background:
-    radial-gradient(circle at top right, rgba(96, 165, 250, 0.28), transparent 32%),
-    linear-gradient(180deg, #0f172a, #1d4ed8);
-  color: #fff;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #0f172a, #1d4ed8);
+  color: #ffffff;
 }
 
-.heroHighlight {
+.liveChip {
+  padding: 0.35rem 0.7rem;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  font-size: 0.78rem;
+}
+
+.heroRevenue {
   display: grid;
-  gap: 0.4rem;
+  gap: 0.5rem;
   padding: 1rem;
-  border-radius: 26px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(191, 219, 254, 0.22);
-}
-
-.heroHighlight strong {
-  font-size: 2rem;
-  color: #fff;
-}
-
-.heroHighlight span {
-  color: rgba(255, 255, 255, 0.82);
-}
-
-.heroTile span {
-  color: #475569;
-}
-
-.heroGrid,
-.overviewGrid,
-.contentGrid,
-.inventoryGrid,
-.syncGrid,
-.chartGrid {
-  display: grid;
-  gap: 1rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .heroGrid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.heroTile {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.liveBar,
+.liveIndicator {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.liveBar {
+  justify-content: space-between;
+  padding: 0.9rem 1.1rem;
+  border-radius: 18px;
+  background: rgba(14, 165, 233, 0.08);
+}
+
+.liveDot {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 999px;
+  background: #16a34a;
+  box-shadow: 0 0 0 6px rgba(22, 163, 74, 0.12);
+}
+
+.successBanner,
+.errorBanner {
+  padding: 1rem 1.15rem;
+  border-radius: 18px;
+}
+
+.successBanner {
+  background: rgba(15, 118, 110, 0.1);
+  color: #0f766e;
+}
+
+.errorBanner {
+  background: rgba(220, 38, 38, 0.08);
+  color: #b91c1c;
 }
 
 .overviewGrid {
@@ -218,326 +221,139 @@
 }
 
 .contentGrid {
-  grid-template-columns: minmax(0, 1.15fr) minmax(340px, 0.85fr);
-}
-
-.chartGrid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-.overviewCard {
-  align-content: start;
-}
-
-.overviewCard span:first-child {
-  color: #1d4ed8;
-  font-weight: 700;
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
 }
 
 .panel {
-  padding: 1.5rem;
+  padding: 1.4rem;
 }
 
-.analyticsPanel {
-  background:
-    radial-gradient(circle at top left, rgba(59, 130, 246, 0.08), transparent 28%),
-    linear-gradient(180deg, #ffffff, #f8fbff);
+.panelMeta {
+  font-size: 0.9rem;
 }
 
-.createComposer {
-  background:
-    radial-gradient(circle at top right, rgba(56, 189, 248, 0.1), transparent 28%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98));
+.feedCard,
+.previewCard,
+.inventoryCard {
+  padding: 1rem;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: none;
 }
 
-.createForm {
+.feedMeta {
   display: grid;
-  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
 }
 
-.chartCard {
-  display: grid;
-  gap: 0.85rem;
-  background: rgba(255, 255, 255, 0.9);
-}
-
-.chartHeading {
-  display: grid;
-  gap: 0.25rem;
-}
-
-.chartFrame {
-  display: grid;
-  gap: 0.55rem;
-}
-
-.chartSvg {
-  width: 100%;
-  height: 150px;
-}
-
-.chartGridLine {
-  stroke: rgba(148, 163, 184, 0.28);
-  stroke-width: 1;
-}
-
-.chartLabels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.78rem;
-}
-
-.chartEmpty {
-  min-height: 150px;
-  display: grid;
-  place-items: center;
-  text-align: center;
-  border-radius: 18px;
-  background: rgba(248, 250, 252, 0.88);
-  color: #64748b;
-  font-size: 0.92rem;
-}
-
-.stockBars {
-  min-height: 150px;
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 0.75rem;
-  align-items: end;
-}
-
-.stockBarItem {
-  display: grid;
-  gap: 0.45rem;
-  justify-items: center;
-  text-align: center;
-}
-
-.stockBarTrack {
-  width: 100%;
-  height: 110px;
-  display: flex;
-  align-items: flex-end;
-  padding: 0.3rem;
-  border-radius: 16px;
-  background: linear-gradient(180deg, rgba(226, 232, 240, 0.5), rgba(241, 245, 249, 0.95));
-}
-
-.stockBarFill {
-  width: 100%;
-  border-radius: 12px;
-  background: linear-gradient(180deg, #38bdf8, #2563eb);
-  box-shadow: 0 12px 20px rgba(37, 99, 235, 0.22);
-}
-
-.stockBarItem strong {
-  font-size: 0.95rem;
-  color: #0f172a;
-}
-
-.stockBarItem span {
-  font-size: 0.76rem;
-  line-height: 1.3;
-}
-
-.liveBar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.95rem 1.15rem;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98));
-}
-
-.liveIndicator {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  color: #0f172a;
-}
-
-.liveIndicator strong {
-  font-size: 0.95rem;
-}
-
-.liveDot {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: #22c55e;
-  box-shadow: 0 0 0 8px rgba(34, 197, 94, 0.12);
-}
-
-.liveChip {
-  padding: 0.35rem 0.75rem;
-  background: rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(191, 219, 254, 0.22);
-}
-
-.statusRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
-.summaryChip {
-  padding: 0.45rem 0.78rem;
-  background: rgba(37, 99, 235, 0.08);
-  color: #1d4ed8;
-}
-
-.orderList,
-.topList {
-  min-height: 100%;
-}
-
-.orderCard {
-  padding: 1.1rem;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.96), rgba(255, 255, 255, 0.96));
-}
-
-.orderHeader strong,
-.topRow strong,
-.syncCard strong {
-  display: block;
-  color: #0f172a;
-}
-
-.badgeStack {
-  justify-content: flex-end;
-}
-
-.statusBadge,
-.inventoryBadge,
-.topBadge {
-  padding: 0.42rem 0.75rem;
-}
-
-.statusNeutral {
-  background: rgba(15, 23, 42, 0.08);
-  color: #0f172a;
-}
-
-.statusSuccess {
-  background: rgba(14, 165, 164, 0.16);
-  color: #0f766e;
-}
-
-.statusPending {
-  background: rgba(234, 88, 12, 0.14);
-  color: #c2410c;
-}
-
-.statusFailed {
-  background: rgba(185, 28, 28, 0.12);
-  color: #991b1b;
-}
-
-.statusMuted {
-  background: rgba(100, 116, 139, 0.12);
-  color: #475569;
-}
-
-.itemChips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.65rem;
-}
-
-.itemChips span {
-  padding: 0.55rem 0.8rem;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.05);
-  color: #334155;
-  font-size: 0.85rem;
-}
-
-.topRow,
-.syncCard {
-  border-radius: 24px;
-  background: rgba(15, 23, 42, 0.04);
-}
-
-.topRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.topBadge {
-  background: rgba(37, 99, 235, 0.14);
-  color: #1d4ed8;
-}
-
-.syncGrid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.syncCard {
-  display: grid;
-  grid-template-columns: 88px 1fr;
-  align-items: center;
-  gap: 0.85rem;
-  padding: 0.75rem;
-}
-
-.syncCard div {
+.feedMeta div,
+.inventoryTitleRow div {
   display: grid;
   gap: 0.2rem;
 }
 
-.syncCard img {
-  width: 88px;
-  height: 88px;
-  border-radius: 22px;
-  object-fit: cover;
+.itemChipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
 }
 
-.inventoryGrid {
+.itemChip {
+  padding: 0.45rem 0.7rem;
+  background: rgba(15, 23, 42, 0.05);
+  color: #334155;
+  font-size: 0.78rem;
+}
+
+.neutralBadge,
+.pendingBadge,
+.successBadge,
+.failedBadge,
+.liveBadge,
+.outBadge,
+.topBadge {
+  padding: 0.38rem 0.72rem;
+  font-size: 0.78rem;
+}
+
+.neutralBadge {
+  background: rgba(15, 23, 42, 0.08);
+  color: #334155;
+}
+
+.pendingBadge {
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+}
+
+.successBadge,
+.liveBadge {
+  background: rgba(22, 163, 74, 0.12);
+  color: #15803d;
+}
+
+.failedBadge,
+.outBadge {
+  background: rgba(220, 38, 38, 0.1);
+  color: #b91c1c;
+}
+
+.topBadge {
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+}
+
+.topList {
+  margin-bottom: 1rem;
+}
+
+.topRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.04);
+}
+
+.topRow div {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.catalogPreviewGrid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.inventoryCard {
+.previewCard {
   overflow: hidden;
-  display: grid;
-  grid-template-columns: 220px 1fr;
 }
 
-.inventoryMedia {
-  position: relative;
-  min-height: 100%;
-}
-
+.previewCard img,
 .inventoryMedia img {
   width: 100%;
-  height: 100%;
+  height: 180px;
   object-fit: cover;
+  border-radius: 16px;
+  background: #f8fafc;
 }
 
-.inventoryBadge {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  background: rgba(15, 23, 42, 0.88);
-  color: #fff;
+.previewCard div {
+  display: grid;
+  gap: 0.3rem;
 }
 
-.inventoryBody {
-  padding: 1.25rem;
-}
-
+.createForm,
 .fieldBlock {
   display: grid;
   gap: 0.45rem;
 }
 
 .fieldBlock span {
-  font-size: 0.84rem;
+  font-size: 0.9rem;
   font-weight: 700;
-  color: #334155;
+  color: #0f172a;
 }
 
 .fieldBlock input,
@@ -545,30 +361,36 @@
 .fieldBlock select {
   width: 100%;
   border: 1px solid rgba(148, 163, 184, 0.35);
-  border-radius: 14px;
-  padding: 0.9rem 1rem;
-  background: rgba(255, 255, 255, 0.92);
-  color: #0f172a;
+  border-radius: 16px;
+  padding: 0.95rem 1rem;
   font: inherit;
+  background: #ffffff;
+  color: #0f172a;
 }
 
 .fieldBlock textarea {
-  min-height: 140px;
   resize: vertical;
+  min-height: 120px;
+}
+
+.inlineFields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .primaryButton,
 .secondaryButton,
 .dangerButton {
   border: none;
-  border-radius: 12px;
-  padding: 0.95rem 1.15rem;
+  border-radius: 14px;
+  padding: 0.95rem 1.1rem;
   font-weight: 700;
+  cursor: pointer;
 }
 
 .primaryButton {
-  background: linear-gradient(135deg, #2563eb, #38bdf8);
-  color: #fff;
+  background: linear-gradient(135deg, #ea580c, #f59e0b);
+  color: #ffffff;
 }
 
 .secondaryButton {
@@ -577,106 +399,92 @@
 }
 
 .dangerButton {
-  background: rgba(185, 28, 28, 0.1);
-  color: #991b1b;
+  background: rgba(220, 38, 38, 0.1);
+  color: #b91c1c;
 }
 
-.primaryButton:disabled,
-.secondaryButton:disabled,
-.dangerButton:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
+.inventoryGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.successBanner,
-.errorBanner {
-  padding: 1rem 1.15rem;
-  border-radius: 22px;
+.inventoryCard {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 1rem;
+  align-items: stretch;
 }
 
-.successBanner {
-  background: rgba(14, 165, 164, 0.1);
-  color: #0f766e;
+.inventoryMedia {
+  align-self: stretch;
 }
 
-.errorBanner {
-  background: rgba(185, 28, 28, 0.08);
-  color: #991b1b;
+.inventoryBody {
+  padding: 0;
 }
 
-.emptyPanel {
+.emptyState,
+.emptyStateCompact {
+  display: grid;
+  gap: 0.5rem;
   place-items: center;
   text-align: center;
-  background: rgba(248, 250, 252, 0.78);
+  padding: 1.25rem;
+  border-radius: 18px;
+  background: rgba(248, 250, 252, 0.96);
 }
 
-.orderSkeleton,
-.topSkeleton,
-.inventorySkeleton {
-  border-radius: 16px;
+.loadingCard {
+  min-height: 140px;
+  border-radius: 18px;
   background:
-    linear-gradient(90deg, rgba(226, 232, 240, 0.6), rgba(255, 255, 255, 0.95), rgba(226, 232, 240, 0.6));
+    linear-gradient(90deg, rgba(226, 232, 240, 0.75), rgba(255, 255, 255, 0.96), rgba(226, 232, 240, 0.75));
 }
 
-.orderSkeleton {
-  height: 160px;
-}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
 
-.topSkeleton {
-  height: 84px;
-}
-
-.inventorySkeleton {
-  height: 360px;
-}
-
-@media (max-width: 1280px) {
-  .overviewGrid,
-  .chartGrid,
-  .inventoryGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-@media (max-width: 1080px) {
+@media (max-width: 1180px) {
   .hero,
   .contentGrid,
   .inventoryCard {
     grid-template-columns: 1fr;
   }
+
+  .overviewGrid,
+  .metricStrip,
+  .catalogPreviewGrid,
+  .inventoryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 760px) {
   .hero,
-  .panel,
-  .overviewCard,
-  .chartCard {
-    padding: 1.2rem;
+  .panel {
+    padding: 1.1rem;
   }
 
-  .heroGrid,
   .overviewGrid,
+  .metricStrip,
+  .heroGrid,
+  .catalogPreviewGrid,
   .inventoryGrid,
-  .syncGrid,
-  .chartGrid {
+  .inlineFields,
+  .feedMeta {
     grid-template-columns: 1fr;
   }
 
-  .stockBars {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .syncCard {
-    grid-template-columns: 72px 1fr;
-  }
-
-  .syncCard img {
-    width: 72px;
-    height: 72px;
-  }
-
-  .liveBar {
-    align-items: flex-start;
-    flex-direction: column;
+  .previewCard img,
+  .inventoryMedia img {
+    height: 220px;
   }
 }

@@ -52,7 +52,7 @@ const sellerDashboardSlice = createSlice({
       })
       .addCase(getSellerOrders.fulfilled, (state, action) => {
         state.isLoadingOrders = false
-        state.orders = action.payload
+        state.orders = Array.isArray(action.payload) ? action.payload : []
       })
       .addCase(getSellerOrders.rejected, (state, action) => {
         state.isLoadingOrders = false
@@ -64,7 +64,7 @@ const sellerDashboardSlice = createSlice({
       })
       .addCase(getSellerDashboardProducts.fulfilled, (state, action) => {
         state.isLoadingProducts = false
-        state.products = action.payload
+        state.products = Array.isArray(action.payload) ? action.payload : []
       })
       .addCase(getSellerDashboardProducts.rejected, (state, action) => {
         state.isLoadingProducts = false

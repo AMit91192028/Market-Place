@@ -1,12 +1,13 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import authClient from './authClient'
-import { getApiErrorMessage } from './createServiceClient'
+import { clearStoredAuthToken, getApiErrorMessage, setStoredAuthToken } from './createServiceClient'
 
 export const registerUser = createAsyncThunk(
   'auth/registerUser',
   async (userData, { rejectWithValue }) => {
     try {
       const response = await authClient.post('/register', userData)
+      setStoredAuthToken(response.data.token)
       return response.data.user
     } catch (error) {
       return rejectWithValue(getApiErrorMessage(error, 'Registration failed'))
@@ -19,6 +20,7 @@ export const loginUser = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const response = await authClient.post('/login', credentials)
+      setStoredAuthToken(response.data.token)
       return response.data.user
     } catch (error) {
       return rejectWithValue(getApiErrorMessage(error, 'Login failed'))
@@ -33,6 +35,10 @@ export const getCurrentUser = createAsyncThunk(
       const response = await authClient.get('/me')
       return response.data.user
     } catch (error) {
+      if (error?.response?.status === 401) {
+        clearStoredAuthToken()
+      }
+
       return rejectWithValue(getApiErrorMessage(error, 'Failed to fetch user'))
     }
   }
@@ -43,6 +49,7 @@ export const logoutUser = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       await authClient.get('/logout')
+      clearStoredAuthToken()
       return null
     } catch (error) {
       return rejectWithValue(getApiErrorMessage(error, 'Logout failed'))

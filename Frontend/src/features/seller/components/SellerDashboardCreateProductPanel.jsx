@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 
-const DEFAULT_VALUES = {
+const defaultValues = {
   title: '',
   category: '',
   description: '',
@@ -13,18 +13,16 @@ const DEFAULT_VALUES = {
 
 export default function SellerDashboardCreateProductPanel({
   styles,
-  handleCreateSubmit,
+  onSubmit,
   isPublishing,
-  setComposerOpen,
+  onCancel,
 }) {
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm({
-    defaultValues: DEFAULT_VALUES,
-  })
+  } = useForm({ defaultValues })
 
   const selectedImages = watch('images')
   const selectedImageNames = useMemo(() => {
@@ -32,28 +30,24 @@ export default function SellerDashboardCreateProductPanel({
   }, [selectedImages])
 
   return (
-    <article className={`${styles.panel} ${styles.createComposer}`} id="seller-create-form">
+    <article className={styles.panel}>
       <div className={styles.panelHeader}>
         <div>
-          <span className={styles.panelLabel}>Add product</span>
-          <h2>Create a new seller listing</h2>
+          <span className={styles.panelEyebrow}>New Listing</span>
+          <h2>Create product in product service</h2>
         </div>
-        <span className={styles.panelMeta}>Description is sent as plain text.</span>
+        <span className={styles.panelMeta}>Images are uploaded as multipart form data.</span>
       </div>
 
-      <form
-        className={styles.createForm}
-        onSubmit={handleSubmit(handleCreateSubmit)}
-        encType="multipart/form-data"
-      >
+      <form className={styles.createForm} onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
         <label className={styles.fieldBlock}>
           <span>Product title</span>
           <input
             type="text"
-            placeholder="Ex: AirPods Pro (2nd generation)"
+            placeholder="Ex: Apple AirPods Pro"
             {...register('title', {
               required: 'Product title is required',
-              validate: (value) => value.trim().length > 2 || 'Enter a more descriptive title',
+              validate: (value) => value.trim().length >= 3 || 'Use at least 3 characters',
             })}
           />
           {errors.title ? <small>{errors.title.message}</small> : null}
@@ -66,7 +60,7 @@ export default function SellerDashboardCreateProductPanel({
             placeholder="Ex: electronics, fashion, home"
             {...register('category', {
               required: 'Category is required',
-              validate: (value) => value.trim().length > 1 || 'Enter a valid category',
+              validate: (value) => value.trim().length >= 2 || 'Use at least 2 characters',
             })}
           />
           {errors.category ? <small>{errors.category.message}</small> : null}
@@ -75,10 +69,11 @@ export default function SellerDashboardCreateProductPanel({
         <label className={styles.fieldBlock}>
           <span>Description</span>
           <textarea
-            placeholder="Write a short product description"
+            rows="5"
+            placeholder="Write a clear product description"
             {...register('description', {
               required: 'Description is required',
-              validate: (value) => value.trim().length > 10 || 'Description should be at least 10 characters',
+              validate: (value) => value.trim().length >= 10 || 'Use at least 10 characters',
             })}
           />
           {errors.description ? <small>{errors.description.message}</small> : null}
@@ -92,12 +87,9 @@ export default function SellerDashboardCreateProductPanel({
               min="1"
               step="1"
               {...register('priceAmount', {
-                required: 'Price amount is required',
+                required: 'Price is required',
                 valueAsNumber: true,
-                min: {
-                  value: 1,
-                  message: 'Price amount must be at least 1',
-                },
+                min: { value: 1, message: 'Price must be at least 1' },
               })}
             />
             {errors.priceAmount ? <small>{errors.priceAmount.message}</small> : null}
@@ -120,10 +112,7 @@ export default function SellerDashboardCreateProductPanel({
               {...register('stock', {
                 required: 'Stock is required',
                 valueAsNumber: true,
-                min: {
-                  value: 0,
-                  message: 'Stock cannot be negative',
-                },
+                min: { value: 0, message: 'Stock cannot be negative' },
               })}
             />
             {errors.stock ? <small>{errors.stock.message}</small> : null}
@@ -132,20 +121,19 @@ export default function SellerDashboardCreateProductPanel({
 
         <label className={styles.fieldBlock}>
           <span>Images</span>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            {...register('images')}
-          />
-          {selectedImageNames.length ? <small>{selectedImageNames.join(', ')}</small> : null}
+          <input type="file" accept="image/*" multiple {...register('images')} />
+          <small>
+            {selectedImageNames.length
+              ? `${selectedImageNames.length} file${selectedImageNames.length === 1 ? '' : 's'} selected: ${selectedImageNames.join(', ')}`
+              : 'Optional. Add up to 5 product images.'}
+          </small>
         </label>
 
         <div className={styles.cardActions}>
           <button type="submit" className={styles.primaryButton} disabled={isPublishing}>
             {isPublishing ? 'Publishing...' : 'Publish product'}
           </button>
-          <button type="button" className={styles.secondaryButton} onClick={() => setComposerOpen(false)}>
+          <button type="button" className={styles.secondaryButton} onClick={onCancel}>
             Cancel
           </button>
         </div>
