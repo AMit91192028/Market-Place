@@ -29,15 +29,6 @@ import styles from '../styles/SellerDashboard.module.css'
 
 const LIVE_REFRESH_MS = 30000
 const SELLER_ORDER_FLOW = ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED']
-const EMPTY_CREATE_DRAFT = {
-  title: '',
-  category: '',
-  description: '',
-  priceAmount: 999,
-  priceCurrency: 'INR',
-  stock: 10,
-  images: [],
-}
 
 function getPaymentBadgeClass(status, cssModule) {
   switch (status) {
@@ -75,7 +66,6 @@ export default function SellerDashboardPage() {
   } = useSelector((state) => state.sellerDashboard)
   const [searchParams, setSearchParams] = useSearchParams()
   const [drafts, setDrafts] = useState({})
-  const [createDraft, setCreateDraft] = useState(EMPTY_CREATE_DRAFT)
   const [message, setMessage] = useState('')
   const [lastUpdatedAt, setLastUpdatedAt] = useState(null)
   const [isPublishing, setIsPublishing] = useState(false)
@@ -162,42 +152,34 @@ export default function SellerDashboardPage() {
       },
     }))
   }
-
-  function updateCreateDraft(field, value) {
-    setCreateDraft((current) => ({
-      ...current,
-      [field]: value,
-    }))
-  }
-
-  async function handleCreateSubmit(event) {
-    event.preventDefault()
+ 
+  async function handleCreateSubmit(values) {
     setIsPublishing(true)
+    setMessage('')
 
     const formData = new FormData()
-    formData.append('title', createDraft.title.trim())
-    formData.append('category', createDraft.category.trim())
-    formData.append('priceAmount', createDraft.priceAmount)
-    formData.append('priceCurrency', createDraft.priceCurrency)
-    formData.append('stock', createDraft.stock)
-    formData.append('description', normalizeProductDescriptionInput(createDraft.description).join('\n'))
+    formData.append('title', String(values.title || '').trim())
+    formData.append('category', String(values.category || '').trim())
+    formData.append('priceAmount', String(values.priceAmount ?? ''))
+    formData.append('priceCurrency', String(values.priceCurrency || 'INR'))
+    formData.append('stock', String(values.stock ?? 0))
+    formData.append('description', normalizeProductDescriptionInput(values.description))
 
-    Array.from(createDraft.images || []).forEach((file) => {
+    Array.from(values.images || []).forEach((file) => {
       formData.append('images', file)
     })
 
     try {
       const createdProduct = await dispatch(createProduct(formData)).unwrap()
-      const refreshResults = await refreshDashboard()
       const createdLabel = createdProduct?.title || 'Product'
 
-      setMessage(
-        hasRefreshFailures(refreshResults)
-          ? `${createdLabel} was created, but one or more dashboard panels are still refreshing.`
-          : `${createdLabel} created and seller dashboard refreshed.`
-      )
-      setCreateDraft(EMPTY_CREATE_DRAFT)
+      setMessage(`${createdLabel} created successfully.`)
       setComposerOpen(false)
+      void refreshDashboard().then((refreshResults) => {
+        if (hasRefreshFailures(refreshResults)) {
+          setMessage(`${createdLabel} created successfully. Some dashboard panels are still refreshing.`)
+        }
+      })
     } catch (createError) {
       setMessage(createError || 'Unable to create this product.')
     } finally {
@@ -353,8 +335,6 @@ export default function SellerDashboardPage() {
       {isComposerOpen ? (
         <SellerDashboardCreateProductPanel
           styles={styles}
-          createDraft={createDraft}
-          updateCreateDraft={updateCreateDraft}
           handleCreateSubmit={handleCreateSubmit}
           isPublishing={isPublishing}
           setComposerOpen={setComposerOpen}
