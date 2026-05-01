@@ -1,7 +1,6 @@
 import axios from 'axios'
 
 export function createServiceClient(baseURL) {
-  console.log(baseURL);
   return axios.create({
     baseURL,
     withCredentials: true,

@@ -2,196 +2,402 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  backdrop-filter: blur(16px);
+  background: #ffffff;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
 }
 
-.topStrip {
-  background: linear-gradient(90deg, #0f172a, #0f766e, #ea580c);
-  color: rgba(255, 255, 255, 0.92);
-  font-size: 0.78rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.topStrip p {
+.utilityInner,
+.searchBarInner,
+.categoryInner,
+.mobileMenuInner {
+  width: min(1440px, calc(100% - 2rem));
   margin: 0 auto;
-  max-width: 1400px;
-  padding: 0.7rem 1.5rem;
-  text-align: center;
 }
 
-.navbar {
-  background: rgba(248, 250, 252, 0.92);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+.utilityBar {
+  background: #f8fafc;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
 }
 
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 1rem 1.5rem;
-  display: grid;
-  grid-template-columns: auto minmax(280px, 1fr) auto;
+.utilityInner {
+  display: flex;
+  justify-content: space-between;
   gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.55rem 0;
+  font-size: 0.8rem;
+  color: #475569;
+}
+
+.utilityList {
+  display: flex;
   align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.locationWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.locationSummary {
+  font-weight: 600;
+}
+
+.locationButton {
+  border: none;
+  background: transparent;
+  color: #2563eb;
+  font-weight: 700;
+  padding: 0;
+}
+
+.locationPanel {
+  position: absolute;
+  top: calc(100% + 0.6rem);
+  right: 0;
+  width: min(380px, calc(100vw - 2rem));
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: #ffffff;
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.14);
+  z-index: 25;
+}
+
+.locationPanelHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.locationPanelHeader strong {
+  display: block;
+  color: #0f172a;
+}
+
+.locationPanelHeader span {
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+.panelClose {
+  border: none;
+  background: transparent;
+  color: #2563eb;
+  font-weight: 700;
+  padding: 0;
+}
+
+.locationStatus {
+  padding: 0.75rem 0.85rem;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 0.82rem;
+}
+
+.addressList,
+.locationForm {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.addressCard {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 0.8rem 0.9rem;
+  text-align: left;
+  color: #0f172a;
+}
+
+.addressCardActive {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.emptyAddress {
+  border-radius: 12px;
+  padding: 0.85rem 0.9rem;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 0.82rem;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+.saveLocationButton {
+  border: none;
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+  background: #2874f0;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.searchBarWrap {
+  background: #2874f0;
+}
+
+.searchBarInner {
+  display: grid;
+  grid-template-columns: auto minmax(420px, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem 0;
 }
 
 .logo {
   display: inline-flex;
   align-items: center;
-  gap: 0.85rem;
-  color: #0f172a;
+  gap: 0.75rem;
+  color: #ffffff;
 }
 
 .logo strong {
   display: block;
-  font-family: 'Fraunces', Georgia, serif;
-  font-size: 1.25rem;
+  font-size: 1.3rem;
+  font-weight: 800;
 }
 
-.logo span:last-child {
-  display: block;
-  color: #475569;
-  font-size: 0.82rem;
+.logo span {
+  font-size: 0.74rem;
+  color: rgba(255, 255, 255, 0.86);
 }
 
 .logoMark {
-  display: grid;
-  place-items: center;
   width: 2.6rem;
   height: 2.6rem;
-  border-radius: 16px;
-  background: linear-gradient(145deg, #0f766e, #ea580c);
-  color: #fff;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #ffe11b;
+  font-size: 0.92rem;
   font-weight: 800;
-  letter-spacing: 0.08em;
+  color: #111827;
 }
 
 .searchBar {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.4rem;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.88);
-  border: 1px solid rgba(148, 163, 184, 0.24);
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.6rem;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 0.35rem;
 }
 
 .searchBar input {
   border: none;
-  background: transparent;
+  border-radius: 8px;
   box-shadow: none;
-  padding: 0.8rem 1rem;
+  padding: 0.82rem 0.95rem;
 }
 
 .searchBar input:focus {
   box-shadow: none;
 }
 
-.searchBar button,
-.primaryButton,
-.secondaryButton,
+.searchBar button {
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  background: #ff9f00;
+  color: #111827;
+  font-weight: 800;
+}
+
+.actionRow {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.accountWrap {
+  position: relative;
+}
+
+.accountButton,
+.actionLink,
 .menuToggle {
   border: none;
-  border-radius: 999px;
-  padding: 0.82rem 1.2rem;
+  border-radius: 8px;
+  padding: 0.72rem 0.88rem;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
   font-weight: 700;
 }
 
-.searchBar button,
-.primaryButton {
-  background: linear-gradient(135deg, #0f766e, #ea580c);
-  color: #fff;
-  box-shadow: 0 12px 24px rgba(15, 118, 110, 0.2);
-}
-
-.secondaryButton,
-.menuToggle {
-  background: rgba(15, 23, 42, 0.06);
-  color: #0f172a;
+.actionLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .menuToggle {
   display: none;
 }
 
-.menu {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+.accountMenu {
+  position: absolute;
+  top: calc(100% + 0.45rem);
+  right: 0;
+  width: 220px;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: #ffffff;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.14);
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.75rem;
+  z-index: 20;
 }
 
-.navLinks {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  flex-wrap: wrap;
+.accountTitle {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #475569;
+  padding: 0.15rem 0.1rem 0.35rem;
 }
 
-.navLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.75rem 1rem;
-  border-radius: 999px;
-  color: #334155;
+.accountLink,
+.accountLinkStrong,
+.accountLogout {
+  border: none;
+  text-align: left;
+  background: #f8fafc;
+  padding: 0.6rem 0.7rem;
+  border-radius: 8px;
+  color: #0f172a;
   font-weight: 600;
 }
 
-.navLink:hover,
-.navLink[aria-current='page'] {
-  background: rgba(15, 118, 110, 0.1);
-  color: #0f766e;
+.accountLinkStrong {
+  color: #2563eb;
+  font-weight: 800;
+}
+
+.accountLogout {
+  color: #b91c1c;
 }
 
 .badge {
+  min-width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 999px;
+  background: #ffe11b;
+  color: #111827;
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.categoryBar {
+  background: #ffffff;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.categoryInner {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  overflow-x: auto;
+  padding: 0.55rem 0;
+}
+
+.homeLink,
+.categoryLink {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  min-width: 1.4rem;
-  height: 1.4rem;
-  padding: 0 0.35rem;
-  border-radius: 999px;
-  background: #ea580c;
-  color: #fff;
-  font-size: 0.74rem;
+  gap: 0.4rem;
+  padding: 0.58rem 0.8rem;
+  border-radius: 10px;
+  color: #1f2937;
+  white-space: nowrap;
+  font-size: 0.88rem;
+  font-weight: 600;
 }
 
-.sessionBox {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+.homeLink[aria-current='page'],
+.homeLink:hover,
+.categoryLink:hover {
+  background: #eef2ff;
+  color: #1d4ed8;
 }
 
-.userMeta {
+.mobileMenu {
+  display: none;
+}
+
+.mobileMenuInner {
   display: grid;
-  gap: 0.15rem;
-  text-align: right;
+  gap: 0.6rem;
+  padding: 0.85rem 0 1rem;
 }
 
-.userMeta strong {
-  font-size: 0.95rem;
+.mobileLink {
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #0f172a;
+  padding: 0.75rem 0.8rem;
+  font-weight: 600;
 }
 
-.userMeta span {
-  color: #64748b;
-  font-size: 0.8rem;
-}
-
-.userLabel {
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.authButtons {
+.mobileAuthRow {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  gap: 0.6rem;
 }
 
-@media (max-width: 1120px) {
-  .container {
+.mobilePrimary,
+.mobileSecondary,
+.mobileLogout,
+.mobileClose {
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 0.9rem;
+  font-weight: 700;
+}
+
+.mobilePrimary {
+  background: #2874f0;
+  color: #fff;
+}
+
+.mobileSecondary {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.mobileLogout {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.mobileClose {
+  background: #0f172a;
+  color: #fff;
+}
+
+@media (max-width: 1160px) {
+  .searchBarInner {
+    grid-template-columns: auto 1fr auto;
+  }
+}
+
+@media (max-width: 980px) {
+  .searchBarInner {
     grid-template-columns: 1fr auto;
   }
 
@@ -199,49 +405,43 @@
     grid-column: 1 / -1;
     order: 3;
   }
-}
 
-@media (max-width: 900px) {
-  .container {
-    grid-template-columns: 1fr auto;
+  .actionLink {
+    display: none;
   }
 
   .menuToggle {
     display: inline-flex;
-    justify-content: center;
   }
 
-  .menu {
-    grid-column: 1 / -1;
+  .categoryBar {
     display: none;
-    flex-direction: column;
-    align-items: stretch;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.96);
-    border-radius: 28px;
-    border: 1px solid rgba(148, 163, 184, 0.2);
-    box-shadow: 0 22px 50px rgba(15, 23, 42, 0.12);
+  }
+
+  .mobileMenu {
+    display: none;
+    border-top: 1px solid rgba(15, 23, 42, 0.08);
+    background: #ffffff;
   }
 
   .open {
-    display: flex;
+    display: block;
+  }
+}
+
+@media (max-width: 640px) {
+  .utilityInner,
+  .searchBarInner,
+  .mobileMenuInner {
+    width: min(100% - 1rem, 1440px);
   }
 
-  .navLinks,
-  .authButtons,
-  .sessionBox {
-    flex-direction: column;
-    align-items: stretch;
+  .formRow {
+    grid-template-columns: 1fr;
   }
 
-  .navLink,
-  .primaryButton,
-  .secondaryButton {
-    justify-content: center;
-    text-align: center;
-  }
-
-  .userMeta {
-    text-align: center;
+  .locationPanel {
+    right: auto;
+    left: 0;
   }
 }

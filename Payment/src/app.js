@@ -1,7 +1,6 @@
 const express = require('express')
 const cookieParser = require('cookie-parser');
-const dotenv = require('dotenv');
-const paymentRouter = require('../src/routes')
+const paymentRouter = require('./routes/payment.routes')
 
 
 const app = express();

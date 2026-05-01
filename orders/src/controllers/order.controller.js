@@ -1,7 +1,7 @@
 const { promises } = require("supertest/lib/test");
 const orderModel = require("../models/order.model")
 const axios = require("axios")
-// const { publishToQueue } = require("../broker/borker");
+const { publishToQueue } = require("../broker/broker");
 
 
 async function createOrder(req, res) {
@@ -72,7 +72,7 @@ async function createOrder(req, res) {
         })
 
 
-        // await publishToQueue("ORDER_SELLER_DASHBOARD.ORDER_CREATED", order)
+        await publishToQueue("ORDER_SELLER_DASHBOARD.ORDER_CREATED", order)
 
         res.status(201).json({ order })
 

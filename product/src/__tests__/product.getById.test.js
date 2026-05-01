@@ -37,6 +37,7 @@ describe('GET /api/products/:id', () => {
   it('returns a product by id', async () => {
     const prod = await Product.create({
       title: 'ByIdProduct',
+      category: 'electronics',
       description: 'By id',
       price: { amount: 50, currency: 'USD' },
       seller: new mongoose.Types.ObjectId().toHexString(),

@@ -1,12 +1,13 @@
 require('dotenv').config();
 const app = require('./src/app');
 const connectToDb = require('./src/db/db')
+const{connect} = require('./src/broker/broker')
 
 connectToDb();
+connect()
 
 
-
-app.listen(3003,(err)=>{
+app.listen(3004,(err)=>{
     if(err){
         return console.log("Server connection error", err)
     }

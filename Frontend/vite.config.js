@@ -9,6 +9,8 @@ export default defineConfig({
       '/api/products': 'http://localhost:3001',
       '/api/cart': 'http://localhost:3002',
       '/api/orders': 'http://localhost:3003',
+      '/api/seller':'http://localhost:3007',
+      '/api/payments':'http://localhost:3004'
     },
   },
 })

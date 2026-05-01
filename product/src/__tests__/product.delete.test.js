@@ -60,6 +60,7 @@ describe('DELETE /api/products/:id (seller)', () => {
     const sellerId = new mongoose.Types.ObjectId().toHexString();
     const prod = await Product.create({
       title: 'ToDelete',
+      category: 'electronics',
       price: { amount: 10, currency: 'USD' },
       seller: sellerId,
     });
@@ -84,6 +85,7 @@ describe('DELETE /api/products/:id (seller)', () => {
 
     const prod = await Product.create({
       title: 'OwnerProduct',
+      category: 'fashion',
       price: { amount: 15, currency: 'USD' },
       seller: ownerId,
     });
@@ -115,6 +117,7 @@ describe('DELETE /api/products/:id (seller)', () => {
     const sellerId = new mongoose.Types.ObjectId().toHexString();
     const prod = await Product.create({
       title: 'Prod',
+      category: 'books',
       price: { amount: 8, currency: 'USD' },
       seller: sellerId,
     });

@@ -52,9 +52,9 @@ describe('GET /api/products/seller (seller)', () => {
     const sellerId = new mongoose.Types.ObjectId().toHexString();
     const otherSellerId = new mongoose.Types.ObjectId().toHexString();
 
-    await Product.create({ title: 'S1', price: { amount: 1, currency: 'USD' }, seller: sellerId });
-    await Product.create({ title: 'S2', price: { amount: 2, currency: 'USD' }, seller: sellerId });
-    await Product.create({ title: 'Other', price: { amount: 3, currency: 'USD' }, seller: otherSellerId });
+    await Product.create({ title: 'S1', category: 'electronics', price: { amount: 1, currency: 'USD' }, seller: sellerId });
+    await Product.create({ title: 'S2', category: 'fashion', price: { amount: 2, currency: 'USD' }, seller: sellerId });
+    await Product.create({ title: 'Other', category: 'books', price: { amount: 3, currency: 'USD' }, seller: otherSellerId });
 
     const token = jwt.sign({ id: sellerId, role: 'seller' }, process.env.JWT_SECRET);
 
@@ -69,7 +69,7 @@ describe('GET /api/products/seller (seller)', () => {
 
   it('returns 401 when not authenticated', async () => {
     const sellerId = new mongoose.Types.ObjectId().toHexString();
-    await Product.create({ title: 'Prod', price: { amount: 1, currency: 'USD' }, seller: sellerId });
+    await Product.create({ title: 'Prod', category: 'electronics', price: { amount: 1, currency: 'USD' }, seller: sellerId });
 
     const res = await request(app).get('/api/products/seller');
     expect(res.status).toBe(401);
@@ -80,7 +80,7 @@ describe('GET /api/products/seller (seller)', () => {
     const sellerId = new mongoose.Types.ObjectId().toHexString();
     const token = jwt.sign({ id: sellerId, role: 'seller' }, process.env.JWT_SECRET);
 
-    await Product.create({ title: 'OtherProd', price: { amount: 5, currency: 'USD' }, seller: new mongoose.Types.ObjectId().toHexString() });
+    await Product.create({ title: 'OtherProd', category: 'home', price: { amount: 5, currency: 'USD' }, seller: new mongoose.Types.ObjectId().toHexString() });
 
     const res = await request(app).get('/api/products/seller').set('Authorization', `Bearer ${token}`);
     expect(res.status).toBe(200);

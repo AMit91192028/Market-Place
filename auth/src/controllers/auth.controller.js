@@ -2,6 +2,7 @@ const userModel = require('../models/users.model');
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const redis = require("../db/redis")
+const{publishToQueue} = require("../broker/broker")
 
 function getCookieOptions() {
     return {
@@ -36,6 +37,17 @@ async function registerUser(req,res){
         fullName:{firstName,lastName},
         role:role ||'user'
     })
+
+        // Publish user created event to rabbitmq
+            await Promise.all([
+                publishToQueue('AUTH_NOTIFICATION.USER_CREATED',{
+                    id:user._id,
+                    username:user.username,
+                    email:user.email,
+                    fullName:user.fullName,
+                }),
+                publishToQueue("AUTH_SELLER_DASHBOARD.USER_CREATED",user)
+            ]);
 
     const token = jwt.sign({
         id:user._id,

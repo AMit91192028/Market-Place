@@ -30,7 +30,11 @@ export default function MyOrdersPage() {
       {error ? <div className={styles.errorBanner}>{error}</div> : null}
 
       {isLoading ? (
-        <div className={styles.emptyState}>Loading your orders...</div>
+        <div className={styles.orderGrid}>
+          {Array.from({ length: 3 }).map((_, index) => (
+            <article key={index} className={styles.orderSkeleton} />
+          ))}
+        </div>
       ) : orders.length ? (
         <div className={styles.orderGrid}>
           {orders.map((order) => (
@@ -67,6 +71,9 @@ export default function MyOrdersPage() {
         <div className={styles.emptyState}>
           <h2>No orders yet</h2>
           <p>Once you place an order from checkout it will show up here.</p>
+          <Link to="/products" className={styles.primaryButton}>
+            Start shopping
+          </Link>
         </div>
       )}
     </section>

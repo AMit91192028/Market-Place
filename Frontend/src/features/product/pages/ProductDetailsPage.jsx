@@ -4,7 +4,16 @@ import { useDispatch, useSelector } from 'react-redux'
 import { addItemToCart } from '../../../services/api/cartApi'
 import { getProductById } from '../../../services/api/productApi'
 import { useAuth } from '../../auth/hooks/useAuth'
-import { formatCurrency, getProductImage } from '../../../utils/marketplace'
+import {
+  getDeliveryLabel,
+  formatCurrency,
+  formatProductCategory,
+  getProductDiscountPercent,
+  getProductDescription,
+  getProductImage,
+  getProductOriginalPrice,
+  getProductRating,
+} from '../../../utils/marketplace'
 import styles from '../styles/Product.module.css'
 
 export default function ProductDetailsPage() {
@@ -61,7 +70,21 @@ export default function ProductDetailsPage() {
         <div className={styles.detailContent}>
           <span className={styles.eyebrow}>Verified marketplace listing</span>
           <h1>{currentProduct.title}</h1>
-          <p>{currentProduct.description || 'A live product listing connected to the product microservice.'}</p>
+          <span className={styles.categoryTag}>{formatProductCategory(currentProduct.category)}</span>
+          <p>
+            {getProductDescription(currentProduct.description) ||
+              'A live product listing connected to the product microservice.'}
+          </p>
+          <div className={styles.marketSignals}>
+            <span className={styles.ratingPill}>⭐ {getProductRating(currentProduct)} rating</span>
+            {getProductDiscountPercent(currentProduct) > 0 ? (
+              <span className={styles.discountPill}>
+                Save {getProductDiscountPercent(currentProduct)}% today
+              </span>
+            ) : (
+              <span className={styles.discountPill}>Best marketplace price</span>
+            )}
+          </div>
 
           <div className={styles.detailStats}>
             <div>
@@ -69,12 +92,25 @@ export default function ProductDetailsPage() {
               <span>Current listed price</span>
             </div>
             <div>
+              <strong>
+                {formatCurrency(
+                  getProductOriginalPrice(currentProduct),
+                  currentProduct.price?.currency || 'INR'
+                )}
+              </strong>
+              <span>MRP before offer</span>
+            </div>
+            <div>
               <strong>{currentProduct.stock || 0}</strong>
               <span>Units available</span>
             </div>
             <div>
-              <strong>Seller-ready</strong>
-              <span>Works with protected routes</span>
+              <strong>{formatProductCategory(currentProduct.category)}</strong>
+              <span>Product category</span>
+            </div>
+            <div>
+              <strong>{getDeliveryLabel(currentProduct)}</strong>
+              <span>Delivery timeline</span>
             </div>
           </div>
 

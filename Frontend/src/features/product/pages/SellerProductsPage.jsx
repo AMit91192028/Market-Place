@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { deleteProduct, getSellerProducts, updateProduct } from '../../../services/api/productApi'
-import { formatCurrency, getProductImage } from '../../../utils/marketplace'
+import { formatCurrency, getProductDescription, getProductImage } from '../../../utils/marketplace'
 import styles from '../styles/Product.module.css'
 
 export default function SellerProductsPage() {
@@ -23,6 +23,16 @@ export default function SellerProductsPage() {
     }
   }, [sellerProducts])
 
+  function getDraft(product) {
+    return drafts[product._id] || {
+      title: product.title,
+      category: product.category || '',
+      description: getProductDescription(product.description),
+      priceAmount: product.price?.amount || 0,
+      stock: product.stock || 0,
+    }
+  }
+
   function updateDraft(productId, field, value) {
     setDrafts((current) => ({
       ...current,
@@ -34,13 +44,21 @@ export default function SellerProductsPage() {
   }
 
   async function handleSave(productId) {
-    const draft = drafts[productId]
+    const product = sellerProducts.find((item) => item._id === productId)
+
+    if (!product) {
+      setMessage('Product could not be found.')
+      return
+    }
+
+    const draft = getDraft(product)
     try {
       await dispatch(
         updateProduct({
           productId,
           data: {
             title: draft.title,
+            category: draft.category,
             description: draft.description,
             stock: Number(draft.stock),
             price: {
@@ -72,7 +90,7 @@ export default function SellerProductsPage() {
         <div>
           <span className={styles.eyebrow}>Seller studio</span>
           <h1>Manage your live inventory</h1>
-          <p>Edit title, pricing, description, and stock directly against the product service.</p>
+          <p>Edit title, category, pricing, description, and stock directly against the product service.</p>
         </div>
         <Link to="/seller/products/new" className={styles.primaryButton}>
           Add a new product
@@ -98,13 +116,10 @@ export default function SellerProductsPage() {
       {error ? <div className={styles.errorBanner}>{error}</div> : null}
 
       <div className={styles.sellerGrid}>
-        {sellerProducts.map((product) => {
-          const draft = drafts[product._id] || {
-            title: product.title,
-            description: product.description || '',
-            priceAmount: product.price?.amount || 0,
-            stock: product.stock || 0,
-          }
+        {isLoading
+          ? Array.from({ length: 3 }).map((_, index) => <article key={index} className={styles.cardSkeleton} />)
+          : sellerProducts.map((product) => {
+          const draft = getDraft(product)
 
           return (
             <article key={product._id} className={styles.sellerCard}>
@@ -117,6 +132,15 @@ export default function SellerProductsPage() {
                     type="text"
                     value={draft.title || ''}
                     onChange={(event) => updateDraft(product._id, 'title', event.target.value)}
+                  />
+                </label>
+
+                <label className={styles.fieldBlock}>
+                  <span>Category</span>
+                  <input
+                    type="text"
+                    value={draft.category || ''}
+                    onChange={(event) => updateDraft(product._id, 'category', event.target.value)}
                   />
                 </label>
 
@@ -159,7 +183,7 @@ export default function SellerProductsPage() {
               </div>
             </article>
           )
-        })}
+            })}
       </div>
 
       {!isLoading && sellerProducts.length === 0 ? (

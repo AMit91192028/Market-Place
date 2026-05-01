@@ -9,11 +9,14 @@
 .summaryPanel,
 .orderCard,
 .detailPanel,
-.emptyState {
-  background: rgba(255, 255, 255, 0.84);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  border-radius: 32px;
-  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+.emptyState,
+.stageCard,
+.checkoutNote,
+.paymentPanel {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 20px;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
 }
 
 .sectionHeader,
@@ -26,8 +29,8 @@
   display: inline-flex;
   padding: 0.45rem 0.85rem;
   border-radius: 999px;
-  background: rgba(15, 118, 110, 0.12);
-  color: #0f766e;
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
   font-size: 0.8rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -36,7 +39,8 @@
 .sectionHeader h1,
 .detailPanel h1 {
   margin: 0.75rem 0 0.4rem;
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-weight: 800;
 }
 
 .checkoutLayout {
@@ -45,14 +49,41 @@
   gap: 1.25rem;
 }
 
+.stageRow,
 .addressColumn,
 .summaryPanel,
 .panel,
 .addressForm,
 .orderItems,
-.orderGrid {
+.orderGrid,
+.paymentActionStack,
+.paymentPanel,
+.checkoutNote {
   display: grid;
   gap: 1rem;
+}
+
+.stageRow {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.stageCard {
+  padding: 1rem;
+  gap: 0.35rem;
+}
+
+.stageCard strong {
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.08);
+}
+
+.stageActive {
+  border-color: rgba(37, 99, 235, 0.34);
+  background: rgba(37, 99, 235, 0.08);
 }
 
 .panel {
@@ -64,7 +95,8 @@
 .summaryRow,
 .cardActions,
 .inlineFields,
-.orderMeta {
+.orderMeta,
+.statusRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -73,7 +105,8 @@
 }
 
 .addressList,
-.orderGrid {
+.orderGrid,
+.paymentInfoGrid {
   display: grid;
   gap: 0.9rem;
 }
@@ -87,8 +120,8 @@
 }
 
 .addressCardActive {
-  border-color: rgba(15, 118, 110, 0.45);
-  background: rgba(15, 118, 110, 0.08);
+  border-color: rgba(37, 99, 235, 0.45);
+  background: rgba(37, 99, 235, 0.08);
 }
 
 .summaryPanel {
@@ -111,7 +144,8 @@
   object-fit: cover;
 }
 
-.orderItem div {
+.orderItem div,
+.compactMeta {
   flex: 1;
   display: grid;
   gap: 0.2rem;
@@ -138,18 +172,34 @@
 }
 
 .orderMeta,
-.orderAddress {
+.orderAddress,
+.subtleText,
+.helperText,
+.paymentInfoGrid span,
+.compactMeta span {
   color: #64748b;
 }
 
-.statusBadge {
+.statusBadge,
+.codePill {
   display: inline-flex;
   align-items: center;
+}
+
+.statusBadge {
   padding: 0.45rem 0.8rem;
-  border-radius: 999px;
-  background: rgba(15, 118, 110, 0.12);
-  color: #0f766e;
+  border-radius: 10px;
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
   font-weight: 700;
+}
+
+.codePill {
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.08);
+  font-size: 0.82rem;
+  color: #0f172a;
 }
 
 .addressBlock {
@@ -160,18 +210,35 @@
   background: rgba(15, 23, 42, 0.04);
 }
 
+.paymentPanel,
+.checkoutNote {
+  padding: 1rem;
+  border-radius: 24px;
+}
+
+.paymentInfoGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.paymentInfoGrid div,
+.checkoutNote {
+  padding: 0.95rem;
+  border-radius: 22px;
+  background: rgba(15, 23, 42, 0.04);
+}
+
 .primaryButton,
 .secondaryButton,
 .ghostButton,
 .dangerButton {
   border: none;
-  border-radius: 18px;
+  border-radius: 10px;
   padding: 0.95rem 1.15rem;
   font-weight: 700;
 }
 
 .primaryButton {
-  background: linear-gradient(135deg, #0f766e, #ea580c);
+  background: linear-gradient(135deg, #2563eb, #38bdf8);
   color: #fff;
 }
 
@@ -193,7 +260,7 @@
 }
 
 .successBanner {
-  background: rgba(15, 118, 110, 0.09);
+  background: rgba(14, 165, 164, 0.1);
   color: #0f766e;
 }
 
@@ -211,8 +278,22 @@
   text-align: center;
 }
 
+.orderSkeleton {
+  height: 180px;
+  border-radius: 24px;
+  background:
+    linear-gradient(90deg, rgba(226, 232, 240, 0.6), rgba(255, 255, 255, 0.95), rgba(226, 232, 240, 0.6));
+}
+
 @media (max-width: 980px) {
   .checkoutLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .stageRow,
+  .paymentInfoGrid {
     grid-template-columns: 1fr;
   }
 }

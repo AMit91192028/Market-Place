@@ -70,6 +70,7 @@ describe('PATCH /api/products/:id (seller)', () => {
     const sellerId = new mongoose.Types.ObjectId().toHexString();
     const prod = await Product.create({
       title: 'Original',
+      category: 'electronics',
       description: 'Original desc',
       price: { amount: 10, currency: 'USD' },
       seller: sellerId,
@@ -84,7 +85,7 @@ describe('PATCH /api/products/:id (seller)', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.product.title).toBe('Updated Title');
-    expect(res.body.product.description).toBe('Updated desc');
+    expect(res.body.product.description).toEqual(['Updated desc']);
     expect(res.body.product.price.amount).toBe(25);
   });
 
@@ -94,6 +95,7 @@ describe('PATCH /api/products/:id (seller)', () => {
 
     const prod = await Product.create({
       title: 'OwnerProduct',
+      category: 'fashion',
       price: { amount: 15, currency: 'USD' },
       seller: ownerId,
     });
@@ -127,6 +129,7 @@ describe('PATCH /api/products/:id (seller)', () => {
     const sellerId = new mongoose.Types.ObjectId().toHexString();
     const prod = await Product.create({
       title: 'Prod',
+      category: 'books',
       price: { amount: 8, currency: 'USD' },
       seller: sellerId,
     });
@@ -141,6 +144,7 @@ describe('PATCH /api/products/:id (seller)', () => {
 
     const prod = await Product.create({
       title: 'Partial',
+      category: 'home',
       description: 'desc',
       price: { amount: 30, currency: 'USD' },
       seller: sellerId,
@@ -154,7 +158,7 @@ describe('PATCH /api/products/:id (seller)', () => {
       .send({ description: 'new desc' });
 
     expect(res.status).toBe(200);
-    expect(res.body.product.description).toBe('new desc');
+    expect(res.body.product.description).toEqual(['new desc']);
     expect(res.body.product.title).toBe('Partial');
     expect(res.body.product.price.amount).toBe(30);
   });

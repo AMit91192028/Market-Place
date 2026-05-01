@@ -12,10 +12,10 @@
 .sellerCard,
 .productCard,
 .heroBoard {
-  background: rgba(255, 255, 255, 0.84);
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  border-radius: 32px;
-  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 20px;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
 }
 
 .hero {
@@ -23,15 +23,14 @@
   grid-template-columns: 1.25fr 0.75fr;
   gap: 1.5rem;
   padding: 2rem;
-  background:
-    radial-gradient(circle at top left, rgba(15, 118, 110, 0.12), transparent 28%),
-    linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(255, 247, 237, 0.92));
+  background: #ffffff;
 }
 
 .heroContent h1,
 .sectionHeader h1,
 .detailContent h1 {
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-weight: 800;
   line-height: 1.05;
   margin: 0.85rem 0;
 }
@@ -40,8 +39,8 @@
   display: inline-flex;
   padding: 0.45rem 0.85rem;
   border-radius: 999px;
-  background: rgba(15, 118, 110, 0.12);
-  color: #0f766e;
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
   font-size: 0.8rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -90,16 +89,42 @@
   color: #64748b;
 }
 
+.marketSignals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+.ratingPill,
+.discountPill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.ratingPill {
+  background: rgba(14, 165, 164, 0.14);
+  color: #0f766e;
+}
+
+.discountPill {
+  background: rgba(37, 99, 235, 0.14);
+  color: #1d4ed8;
+}
+
 .heroBoard {
   display: grid;
   gap: 1rem;
   padding: 1.5rem;
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(15, 118, 110, 0.92));
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(37, 99, 235, 0.92));
   color: #fff;
 }
 
 .heroCardAccent {
-  background: rgba(249, 115, 22, 0.24);
+  background: rgba(96, 165, 250, 0.22);
   font-weight: 700;
 }
 
@@ -172,6 +197,17 @@
   color: #0f766e;
 }
 
+.categoryTag {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0.35rem 0.75rem;
+  border-radius: 10px;
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
 .productBody,
 .detailContent,
 .sellerFields,
@@ -207,13 +243,13 @@
 .secondaryButton,
 .dangerButton {
   border: none;
-  border-radius: 18px;
+  border-radius: 10px;
   padding: 0.95rem 1.15rem;
   font-weight: 700;
 }
 
 .primaryButton {
-  background: linear-gradient(135deg, #0f766e, #ea580c);
+  background: linear-gradient(135deg, #2563eb, #38bdf8);
   color: #fff;
 }
 
@@ -280,7 +316,7 @@
 
 .detailStats {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 1rem;
 }
 
@@ -293,7 +329,7 @@
 }
 
 .backLink {
-  color: #0f766e;
+  color: #1d4ed8;
   font-weight: 700;
 }
 

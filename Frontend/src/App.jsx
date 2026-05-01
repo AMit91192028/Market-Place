@@ -1,5 +1,7 @@
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom'
+import Footer from './components/layout/Footer'
 import Navbar from './components/layout/Navbar'
+import AiBuddyChat from './features/ai-buddy/components/AiBuddyChat'
 import { useAuth, useInitializeAuth } from './features/auth/hooks/useAuth'
 import LoginPage from './features/auth/pages/LoginPage'
 import RegisterPage from './features/auth/pages/RegisterPage'
@@ -10,7 +12,8 @@ import OrderDetailsPage from './features/order/pages/OrderDetailsPage'
 import CreateProductPage from './features/product/pages/CreateProductPage'
 import ProductDetailsPage from './features/product/pages/ProductDetailsPage'
 import ProductListingPage from './features/product/pages/ProductListingPage'
-import SellerProductsPage from './features/product/pages/SellerProductsPage'
+import StorefrontHomePage from './features/product/pages/StorefrontHomePage'
+import SellerDashboardPage from './features/seller/pages/SellerDashboardPage'
 import './styles/index.css'
 
 function AppLayout() {
@@ -20,6 +23,8 @@ function AppLayout() {
       <main className="pageShell">
         <Outlet />
       </main>
+      <Footer />
+      <AiBuddyChat />
     </div>
   )
 }
@@ -59,7 +64,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route element={<AppLayout />}>
-          <Route path="/" element={<Navigate to="/products" replace />} />
+          <Route path="/" element={<StorefrontHomePage />} />
           <Route path="/products" element={<ProductListingPage />} />
           <Route path="/products/:productId" element={<ProductDetailsPage />} />
           <Route
@@ -114,7 +119,7 @@ export default function App() {
             path="/seller/products"
             element={
               <ProtectedRoute roles={['seller']}>
-                <SellerProductsPage />
+                <SellerDashboardPage />
               </ProtectedRoute>
             }
           />

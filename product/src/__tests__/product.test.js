@@ -12,6 +12,10 @@ jest.mock('../services/imagekit.service', () => ({
     })),
 }));
 
+jest.mock('../broker/broker', () => ({
+    publishToQueue: jest.fn(async () => undefined),
+}));
+
 const app = require('../app');
 
 describe('POST /api/products', () => {
@@ -42,6 +46,7 @@ describe('POST /api/products', () => {
             .post('/api/products')
             .set('Authorization', `Bearer ${token}`)
             .field('title', 'Test Product')
+            .field('category', 'electronics')
             .field('description', 'Nice one')
             .field('priceAmount', '99.99')
             .field('priceCurrency', 'USD')
@@ -49,6 +54,8 @@ describe('POST /api/products', () => {
 
         expect(res.status).toBe(201);
         expect(res.body?.data?.title).toBe('Test Product');
+        expect(res.body?.data?.category).toBe('electronics');
+        expect(res.body?.data?.description).toEqual(['Nice one']);
         expect(res.body?.data?.price?.amount).toBe(99.99);
         expect(res.body?.data?.images?.length).toBe(1);
         expect(res.body?.data?.images[ 0 ]?.url).toContain('https://ik.mock/');

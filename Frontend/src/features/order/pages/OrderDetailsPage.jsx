@@ -1,14 +1,21 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import { cancelOrder, getOrderById, updateOrderAddress } from '../../../services/api/orderApi'
-import { formatAddress, formatCurrency } from '../../../utils/marketplace'
+import {
+  formatAddress,
+  formatCurrency,
+  formatDateTime,
+  formatStatusLabel,
+} from '../../../utils/marketplace'
+import { getPaymentSnapshot } from '../../../utils/paymentSession'
 import styles from '../styles/Order.module.css'
 
 export default function OrderDetailsPage() {
   const { orderId } = useParams()
   const dispatch = useDispatch()
   const { currentOrder, error } = useSelector((state) => state.order)
+  const { currentPayment } = useSelector((state) => state.payment)
   const [editAddress, setEditAddress] = useState(false)
   const [draftAddress, setDraftAddress] = useState({
     street: '',
@@ -17,6 +24,9 @@ export default function OrderDetailsPage() {
     pincode: '',
     country: 'India',
   })
+  const storedPayment = useMemo(() => getPaymentSnapshot(orderId), [orderId])
+  const paymentDetails =
+    String(currentPayment?.order) === String(orderId) ? currentPayment : storedPayment
 
   useEffect(() => {
     dispatch(getOrderById(orderId))
@@ -51,8 +61,9 @@ export default function OrderDetailsPage() {
           <div>
             <span className={styles.eyebrow}>Order details</span>
             <h1>Order #{currentOrder._id.slice(-8)}</h1>
+            <p className={styles.subtleText}>Placed on {formatDateTime(currentOrder.createdAt)}</p>
           </div>
-          <span className={styles.statusBadge}>{currentOrder.status}</span>
+          <span className={styles.statusBadge}>{formatStatusLabel(currentOrder.status)}</span>
         </div>
 
         <div className={styles.summaryRow}>
@@ -113,13 +124,47 @@ export default function OrderDetailsPage() {
           ) : null}
         </div>
 
+        <div className={styles.paymentPanel}>
+          <div className={styles.panelHeader}>
+            <h2>Payment snapshot</h2>
+            <span className={styles.statusBadge}>
+              {formatStatusLabel(paymentDetails?.status || 'not initiated')}
+            </span>
+          </div>
+
+          {paymentDetails ? (
+            <div className={styles.paymentInfoGrid}>
+              <div>
+                <span>Gateway order</span>
+                <strong>{paymentDetails.razorpayOrderId || 'Unavailable'}</strong>
+              </div>
+              <div>
+                <span>Payment id</span>
+                <strong>{paymentDetails.paymentId || 'Pending verification'}</strong>
+              </div>
+              <div>
+                <span>Charged amount</span>
+                <strong>
+                  {formatCurrency(
+                    paymentDetails.price?.amount,
+                    paymentDetails.price?.currency || currentOrder.totalPrice?.currency || 'INR'
+                  )}
+                </strong>
+              </div>
+            </div>
+          ) : (
+            <p className={styles.subtleText}>No payment snapshot is available for this order yet.</p>
+          )}
+        </div>
+
         <div className={styles.orderItems}>
           {currentOrder.items.map((item) => (
             <div key={`${item.product}-${item.quantity}`} className={styles.lineItem}>
-              <span>Product {String(item.product).slice(-6)}</span>
-              <span>
-                {item.quantity} x {formatCurrency(item.price?.amount, item.price?.currency || 'INR')}
-              </span>
+              <div className={styles.compactMeta}>
+                <strong>Product {String(item.product).slice(-6)}</strong>
+                <span>{item.quantity} unit(s)</span>
+              </div>
+              <strong>{formatCurrency(item.price?.amount, item.price?.currency || 'INR')}</strong>
             </div>
           ))}
         </div>

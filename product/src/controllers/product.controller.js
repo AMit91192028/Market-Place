@@ -2,7 +2,7 @@ const  mongoose  = require('mongoose');
 const productModel = require('../model/product.model')
 const {uploadImage} = require('../services/imagekit.service');
 // const mongoose = require('mongoose');
-// const { publishToQueue } = require("../broker/borker")
+const { publishToQueue } = require("../broker/broker")
 
 
 
@@ -10,7 +10,7 @@ const {uploadImage} = require('../services/imagekit.service');
 async function createProduct(req, res) {
     console.log('createProduct called');
     try {
-        const { title, description, priceAmount, priceCurrency = 'INR', stock = 0 } = req.body;
+        const { title, description, category,priceAmount, priceCurrency = 'INR', stock = 0 } = req.body;
 
         const seller = req.user.id; // Extract seller from authenticated user
 
@@ -25,11 +25,23 @@ async function createProduct(req, res) {
         const product = await productModel.create({
             title,
             description,
+            category,
             price,
             seller,
             images,
             stock: Number(stock) || 0,
         });
+
+        await Promise.all([
+            publishToQueue("PRODUCT_SELLER_DASHBOARD.PRODUCT_CREATED",product),
+            publishToQueue("PRODUCT_NOTIFICATION.PRODUCT_CREATED",{
+                email: req.user.email,
+                username:req.user.username,
+                productId:product._id,
+                sellerId:seller
+
+            })
+        ]);
 
         return res.status(201).json({
             message: 'Product created',
@@ -93,7 +105,7 @@ async function updateProduct(req,res){
         return res.status(403).json({message:'Forbidden: Not owner'})
     }
 
-    const allowedUpdates = ['title','description','price', 'stock'];
+    const allowedUpdates = ['title','description','category','price', 'stock'];
        for (const key of Object.keys(req.body)) {
         if (allowedUpdates.includes(key)) {
             if (key === 'price' && typeof req.body.price === 'object') {

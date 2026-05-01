@@ -44,6 +44,7 @@ describe('GET /api/products', () => {
   it('returns created products', async () => {
     await Product.create({
       title: 'Alpha',
+      category: 'electronics',
       description: 'First product',
       price: { amount: 10, currency: 'USD' },
       seller: new mongoose.Types.ObjectId().toHexString(),
@@ -52,6 +53,7 @@ describe('GET /api/products', () => {
 
     await Product.create({
       title: 'Beta',
+      category: 'fashion',
       description: 'Second product',
       price: { amount: 20, currency: 'USD' },
       seller: new mongoose.Types.ObjectId().toHexString(),
@@ -68,6 +70,7 @@ describe('GET /api/products', () => {
   it('supports text search with q param', async () => {
     await Product.create({
       title: 'UniqueSearchTitle',
+      category: 'books',
       description: 'Find me',
       price: { amount: 15, currency: 'USD' },
       seller: new mongoose.Types.ObjectId().toHexString(),
@@ -82,12 +85,14 @@ describe('GET /api/products', () => {
   it('filters by price range (minprice, maxprice)', async () => {
     await Product.create({
       title: 'Cheap',
+      category: 'grocery',
       price: { amount: 5, currency: 'USD' },
       seller: new mongoose.Types.ObjectId().toHexString(),
     });
 
     await Product.create({
       title: 'Expensive',
+      category: 'appliances',
       price: { amount: 100, currency: 'USD' },
       seller: new mongoose.Types.ObjectId().toHexString(),
     });

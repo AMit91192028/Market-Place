@@ -23,6 +23,7 @@ export default function CreateProductPage() {
   async function onSubmit(values) {
     const formData = new FormData()
     formData.append('title', values.title)
+    formData.append('category', values.category)
     formData.append('description', values.description)
     formData.append('priceAmount', values.priceAmount)
     formData.append('priceCurrency', values.priceCurrency)
@@ -58,6 +59,16 @@ export default function CreateProductPage() {
             <span>Product title</span>
             <input type="text" {...register('title', { required: 'Title is required' })} />
             {errors.title ? <small>{errors.title.message}</small> : null}
+          </label>
+
+          <label className={styles.fieldBlock}>
+            <span>Category</span>
+            <input
+              type="text"
+              placeholder="Ex: electronics, fashion, home"
+              {...register('category', { required: 'Category is required' })}
+            />
+            {errors.category ? <small>{errors.category.message}</small> : null}
           </label>
 
           <label className={styles.fieldBlock}>

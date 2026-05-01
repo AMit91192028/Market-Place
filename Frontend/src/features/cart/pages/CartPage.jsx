@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { clearCart, getCart, removeCartItem, updateCartItem } from '../../../services/api/cartApi'
-import { formatCurrency, getProductImage } from '../../../utils/marketplace'
+import { formatCurrency, getDeliveryLabel, getProductImage } from '../../../utils/marketplace'
 import styles from '../styles/Cart.module.css'
 
 export default function CartPage() {
@@ -55,7 +55,20 @@ export default function CartPage() {
       {message ? <div className={styles.successBanner}>{message}</div> : null}
       {error ? <div className={styles.errorBanner}>{error}</div> : null}
 
-      {!isLoading && items.length === 0 ? (
+      {isLoading ? (
+        <div className={styles.layout}>
+          <div className={styles.itemStack}>
+            {Array.from({ length: 3 }).map((_, index) => (
+              <article key={index} className={styles.itemSkeleton} />
+            ))}
+          </div>
+          <aside className={styles.summaryCard}>
+            <div className={styles.summarySkeleton} />
+            <div className={styles.summarySkeleton} />
+            <div className={styles.summarySkeleton} />
+          </aside>
+        </div>
+      ) : items.length === 0 ? (
         <div className={styles.emptyState}>
           <h2>Your cart is empty</h2>
           <p>Pick something from the marketplace feed and it will appear here instantly.</p>
@@ -74,6 +87,7 @@ export default function CartPage() {
                   <h3>{item.title}</h3>
                   <p>{item.description}</p>
                   <span className={styles.itemMeta}>{item.stock > 0 ? `${item.stock} left in stock` : 'Out of stock'}</span>
+                  <span className={styles.deliveryMeta}>{getDeliveryLabel(item)}</span>
                 </div>
 
                 <div className={styles.itemActions}>
