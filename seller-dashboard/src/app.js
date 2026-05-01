@@ -1,11 +1,15 @@
 const express = require("express");
 const cookieParser = require('cookie-parser')
+const cors = require('cors')
 const sellerRoutes = require('./router/seller.routes')
 
 
 const app = express();
 
-
+app.use(cors({
+  origin: ['http://localhost:5173','https://market-place-tawny-eight.vercel.app'],
+  credentials: true
+}));
 app.use(express.json());
 app.use(cookieParser());
 
