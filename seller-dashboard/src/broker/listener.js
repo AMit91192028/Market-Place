@@ -14,6 +14,18 @@ module.exports = async function () {
         await productModel.create(product)
     })
 
+    subscribeToQueue("PRODUCT_SELLER_DASHBOARD.PRODUCT_UPDATED", async (product) => {
+        await productModel.findOneAndUpdate(
+            { _id: product._id },
+            { ...product },
+            { new: true, upsert: true }
+        )
+    })
+
+    subscribeToQueue("PRODUCT_SELLER_DASHBOARD.PRODUCT_DELETED", async (product) => {
+        await productModel.findOneAndDelete({ _id: product._id })
+    })
+
     subscribeToQueue("ORDER_SELLER_DASHBOARD.ORDER_CREATED", async (order) => {
         await orderModel.create(order)
     })

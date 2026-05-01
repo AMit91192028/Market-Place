@@ -1,16 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { addItemToCart } from '../../../services/api/cartApi'
 import { getProducts } from '../../../services/api/productApi'
-import { useAuth } from '../../auth/hooks/useAuth'
 import {
-  getDeliveryLabel,
   formatCurrency,
   formatProductCategory,
-  getBadgeText,
   getProductDiscountPercent,
-  getProductDescription,
   getProductImage,
   getProductOriginalPrice,
   getProductRating,
@@ -25,12 +20,9 @@ const QUICK_FILTERS = [
 
 export default function ProductListingPage() {
   const dispatch = useDispatch()
-  const navigate = useNavigate()
-  const { isAuthenticated, role } = useAuth()
   const { products, isLoading, error } = useSelector((state) => state.product)
   const [searchParams, setSearchParams] = useSearchParams()
   const [sort, setSort] = useState('featured')
-  const [message, setMessage] = useState('')
 
   const query = searchParams.get('q') || ''
   const category = searchParams.get('category') || ''
@@ -83,20 +75,6 @@ export default function ProductListingPage() {
     }
   }, [category, products, sort])
 
-  async function handleAddToCart(productId) {
-    if (!isAuthenticated || role !== 'user') {
-      navigate('/auth/login')
-      return
-    }
-
-    try {
-      await dispatch(addItemToCart({ productId, qty: 1 })).unwrap()
-      setMessage('Item added to cart.')
-    } catch (cartError) {
-      setMessage(cartError || 'Unable to add item to cart.')
-    }
-  }
-
   function updateFilters(nextValues) {
     const params = new URLSearchParams(searchParams)
 
@@ -144,7 +122,6 @@ export default function ProductListingPage() {
         </div>
       </div>
 
-      {message ? <div className={styles.successBanner}>{message}</div> : null}
       {error ? <div className={styles.errorBanner}>{error}</div> : null}
 
       <div className={styles.catalogLayout}>
@@ -239,62 +216,35 @@ export default function ProductListingPage() {
           </div>
 
           {isLoading ? (
-            <div className={styles.listStack}>
+            <div className={styles.productGrid}>
               {Array.from({ length: 5 }).map((_, index) => (
                 <article key={index} className={styles.cardSkeleton} />
               ))}
             </div>
           ) : visibleProducts.length ? (
-            <div className={styles.listStack}>
+            <div className={styles.productGrid}>
               {visibleProducts.map((product) => (
-                <article key={product._id} className={styles.productCard}>
+                <Link key={product._id} to={`/products/${product._id}`} className={styles.productCard}>
                   <div className={styles.productMedia}>
                     <img src={getProductImage(product)} alt={product.title} />
-                    <span className={styles.productBadge}>{getBadgeText(product)}</span>
+                    <span className={styles.ratingBadge}>{getProductRating(product)}★</span>
                   </div>
 
-                  <div className={styles.productSummary}>
-                    <span className={styles.categoryTag}>{formatProductCategory(product.category)}</span>
+                  <div className={styles.productBody}>
                     <h3>{product.title}</h3>
-                    <p>
-                      {getProductDescription(product.description) ||
-                        'A marketplace essential with live pricing and service-backed checkout.'}
-                    </p>
-                    <div className={styles.summaryMeta}>
-                      <span className={styles.ratingPill}>Rating {getProductRating(product)}</span>
-                      <span>{product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}</span>
-                      <span>{getDeliveryLabel(product)}</span>
-                    </div>
-                  </div>
-
-                  <div className={styles.buyPanel}>
-                    <strong>{formatCurrency(product.price?.amount, product.price?.currency || 'INR')}</strong>
-                    {getProductDiscountPercent(product) > 0 ? (
-                      <>
+                    <div className={styles.priceRow}>
+                      <strong>{formatCurrency(product.price?.amount, product.price?.currency || 'INR')}</strong>
+                      {getProductDiscountPercent(product) > 0 ? (
                         <span className={styles.originalPrice}>
                           {formatCurrency(getProductOriginalPrice(product), product.price?.currency || 'INR')}
                         </span>
-                        <span className={styles.discountText}>
-                          {getProductDiscountPercent(product)}% off
-                        </span>
-                      </>
-                    ) : (
-                      <span className={styles.discountText}>{getBadgeText(product)}</span>
-                    )}
-                    <div className={styles.cardActions}>
-                      <Link to={`/products/${product._id}`} className={styles.secondaryButton}>
-                        View details
-                      </Link>
-                      <button
-                        className={styles.primaryButton}
-                        disabled={product.stock <= 0}
-                        onClick={() => handleAddToCart(product._id)}
-                      >
-                        Add to cart
-                      </button>
+                      ) : null}
                     </div>
+                    <p className={styles.offerText}>
+                      {formatCurrency(Math.max(Math.round((Number(product.price?.amount) || 0) * 0.95), 0))} with Bank offer
+                    </p>
                   </div>
-                </article>
+                </Link>
               ))}
             </div>
           ) : (

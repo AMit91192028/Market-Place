@@ -42,9 +42,7 @@ export const createProduct = createAsyncThunk(
   'product/createProduct',
   async (formData, { rejectWithValue }) => {
     try {
-      const response = await productClient.post('/', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      })
+      const response = await productClient.post('/', formData)
       return response.data.data
     } catch (error) {
       return rejectWithValue(getApiErrorMessage(error, 'Failed to create product'))

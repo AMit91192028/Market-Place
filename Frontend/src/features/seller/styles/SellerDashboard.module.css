@@ -11,19 +11,23 @@
 .orderCard,
 .inventoryCard,
 .syncCard,
-.emptyPanel {
+.emptyPanel,
+.chartCard,
+.liveBar {
   background: #ffffff;
   border: 1px solid rgba(15, 23, 42, 0.1);
-  border-radius: 20px;
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+  border-radius: 22px;
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
 }
 
 .hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+  grid-template-columns: minmax(0, 1.18fr) minmax(340px, 0.82fr);
   gap: 1.25rem;
   padding: 1.75rem;
-  background: #ffffff;
+  background:
+    radial-gradient(circle at top left, rgba(96, 165, 250, 0.16), transparent 30%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98));
 }
 
 .heroContent,
@@ -32,7 +36,8 @@
 .panel,
 .inventoryBody,
 .topList,
-.orderList {
+.orderList,
+.analyticsPanel {
   display: grid;
   gap: 1rem;
 }
@@ -43,6 +48,7 @@
   margin: 0;
   font-family: 'Inter', 'Segoe UI', sans-serif;
   font-weight: 800;
+  color: #0f172a;
 }
 
 .heroContent p,
@@ -51,11 +57,14 @@
 .panelMeta,
 .topRow span,
 .heroHighlight span,
-.heroTile span,
 .metricPill span,
 .syncCard span,
 .orderHeader span,
-.orderMeta span {
+.orderMeta span,
+.liveBar span,
+.chartHeading span,
+.chartLabels span,
+.stockBarItem span {
   color: #64748b;
 }
 
@@ -63,7 +72,9 @@
 .panelLabel,
 .statusBadge,
 .inventoryBadge,
-.topBadge {
+.topBadge,
+.liveChip,
+.summaryChip {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -74,6 +85,7 @@
 }
 
 .eyebrow {
+  width: fit-content;
   padding: 0.45rem 0.85rem;
   background: rgba(37, 99, 235, 0.12);
   color: #1d4ed8;
@@ -91,6 +103,7 @@
 .heroActions,
 .metricStrip,
 .panelHeader,
+.panelHeaderCompact,
 .orderHeader,
 .badgeStack,
 .orderMeta,
@@ -103,6 +116,11 @@
   flex-wrap: wrap;
 }
 
+.panelHeaderCompact {
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
 .metricStrip {
   margin-top: 0.5rem;
 }
@@ -111,15 +129,25 @@
 .heroTile,
 .overviewCard,
 .topRow,
-.emptyPanel {
+.emptyPanel,
+.chartCard {
   padding: 1rem;
 }
 
-.metricPill,
+.metricPill {
+  min-width: 160px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  display: grid;
+  gap: 0.35rem;
+}
+
 .heroTile {
   min-width: 150px;
-  border-radius: 14px;
-  background: #f8fafc;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(191, 219, 254, 0.45);
   display: grid;
   gap: 0.35rem;
 }
@@ -130,13 +158,22 @@
 .overviewCard strong,
 .topRow strong,
 .syncCard strong,
-.orderMeta strong {
+.orderMeta strong,
+.chartHeading strong,
+.stockBarItem strong {
   font-size: 1.2rem;
+}
+
+.metricPill strong,
+.heroTile strong {
+  color: #0f172a;
 }
 
 .heroPanel {
   padding: 1.5rem;
-  background: linear-gradient(180deg, #0f172a, #1e3a8a);
+  background:
+    radial-gradient(circle at top right, rgba(96, 165, 250, 0.28), transparent 32%),
+    linear-gradient(180deg, #0f172a, #1d4ed8);
   color: #fff;
 }
 
@@ -145,23 +182,29 @@
   gap: 0.4rem;
   padding: 1rem;
   border-radius: 26px;
-  background: rgba(96, 165, 250, 0.18);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(191, 219, 254, 0.22);
 }
 
 .heroHighlight strong {
   font-size: 2rem;
+  color: #fff;
 }
 
-.heroHighlight span,
+.heroHighlight span {
+  color: rgba(255, 255, 255, 0.82);
+}
+
 .heroTile span {
-  color: rgba(255, 255, 255, 0.78);
+  color: #475569;
 }
 
 .heroGrid,
 .overviewGrid,
 .contentGrid,
 .inventoryGrid,
-.syncGrid {
+.syncGrid,
+.chartGrid {
   display: grid;
   gap: 1rem;
 }
@@ -175,7 +218,11 @@
 }
 
 .contentGrid {
-  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+  grid-template-columns: minmax(0, 1.15fr) minmax(340px, 0.85fr);
+}
+
+.chartGrid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .overviewCard {
@@ -189,6 +236,156 @@
 
 .panel {
   padding: 1.5rem;
+}
+
+.analyticsPanel {
+  background:
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.08), transparent 28%),
+    linear-gradient(180deg, #ffffff, #f8fbff);
+}
+
+.createComposer {
+  background:
+    radial-gradient(circle at top right, rgba(56, 189, 248, 0.1), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98));
+}
+
+.createForm {
+  display: grid;
+  gap: 1rem;
+}
+
+.chartCard {
+  display: grid;
+  gap: 0.85rem;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.chartHeading {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.chartFrame {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.chartSvg {
+  width: 100%;
+  height: 150px;
+}
+
+.chartGridLine {
+  stroke: rgba(148, 163, 184, 0.28);
+  stroke-width: 1;
+}
+
+.chartLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+}
+
+.chartEmpty {
+  min-height: 150px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  border-radius: 18px;
+  background: rgba(248, 250, 252, 0.88);
+  color: #64748b;
+  font-size: 0.92rem;
+}
+
+.stockBars {
+  min-height: 150px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.75rem;
+  align-items: end;
+}
+
+.stockBarItem {
+  display: grid;
+  gap: 0.45rem;
+  justify-items: center;
+  text-align: center;
+}
+
+.stockBarTrack {
+  width: 100%;
+  height: 110px;
+  display: flex;
+  align-items: flex-end;
+  padding: 0.3rem;
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(226, 232, 240, 0.5), rgba(241, 245, 249, 0.95));
+}
+
+.stockBarFill {
+  width: 100%;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #38bdf8, #2563eb);
+  box-shadow: 0 12px 20px rgba(37, 99, 235, 0.22);
+}
+
+.stockBarItem strong {
+  font-size: 0.95rem;
+  color: #0f172a;
+}
+
+.stockBarItem span {
+  font-size: 0.76rem;
+  line-height: 1.3;
+}
+
+.liveBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.95rem 1.15rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98));
+}
+
+.liveIndicator {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: #0f172a;
+}
+
+.liveIndicator strong {
+  font-size: 0.95rem;
+}
+
+.liveDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #22c55e;
+  box-shadow: 0 0 0 8px rgba(34, 197, 94, 0.12);
+}
+
+.liveChip {
+  padding: 0.35rem 0.75rem;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(191, 219, 254, 0.22);
+}
+
+.statusRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.summaryChip {
+  padding: 0.45rem 0.78rem;
+  background: rgba(37, 99, 235, 0.08);
+  color: #1d4ed8;
 }
 
 .orderList,
@@ -205,6 +402,7 @@
 .topRow strong,
 .syncCard strong {
   display: block;
+  color: #0f172a;
 }
 
 .badgeStack {
@@ -286,6 +484,11 @@
   padding: 0.75rem;
 }
 
+.syncCard div {
+  display: grid;
+  gap: 0.2rem;
+}
+
 .syncCard img {
   width: 88px;
   height: 88px;
@@ -334,13 +537,31 @@
 .fieldBlock span {
   font-size: 0.84rem;
   font-weight: 700;
+  color: #334155;
+}
+
+.fieldBlock input,
+.fieldBlock textarea,
+.fieldBlock select {
+  width: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 14px;
+  padding: 0.9rem 1rem;
+  background: rgba(255, 255, 255, 0.92);
+  color: #0f172a;
+  font: inherit;
+}
+
+.fieldBlock textarea {
+  min-height: 140px;
+  resize: vertical;
 }
 
 .primaryButton,
 .secondaryButton,
 .dangerButton {
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 0.95rem 1.15rem;
   font-weight: 700;
 }
@@ -358,6 +579,13 @@
 .dangerButton {
   background: rgba(185, 28, 28, 0.1);
   color: #991b1b;
+}
+
+.primaryButton:disabled,
+.secondaryButton:disabled,
+.dangerButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .successBanner,
@@ -402,8 +630,9 @@
   height: 360px;
 }
 
-@media (max-width: 1240px) {
+@media (max-width: 1280px) {
   .overviewGrid,
+  .chartGrid,
   .inventoryGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -420,15 +649,21 @@
 @media (max-width: 760px) {
   .hero,
   .panel,
-  .overviewCard {
+  .overviewCard,
+  .chartCard {
     padding: 1.2rem;
   }
 
   .heroGrid,
   .overviewGrid,
   .inventoryGrid,
-  .syncGrid {
+  .syncGrid,
+  .chartGrid {
     grid-template-columns: 1fr;
+  }
+
+  .stockBars {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .syncCard {
@@ -438,5 +673,10 @@
   .syncCard img {
     width: 72px;
     height: 72px;
+  }
+
+  .liveBar {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }

@@ -61,4 +61,22 @@ describe('POST /api/products', () => {
         expect(res.body?.data?.images[ 0 ]?.url).toContain('https://ik.mock/');
     });
 
+    it('accepts multipart descriptions sent as repeated fields and still uploads images', async () => {
+        const token = jwt.sign({ id: new mongoose.Types.ObjectId().toHexString(), role: 'seller' }, process.env.JWT_SECRET);
+        const res = await request(app)
+            .post('/api/products')
+            .set('Authorization', `Bearer ${token}`)
+            .field('title', 'Layered Product')
+            .field('category', 'fashion')
+            .field('description', 'First line')
+            .field('description', 'Second line')
+            .field('priceAmount', '1499')
+            .field('priceCurrency', 'INR')
+            .attach('images', path.join(__dirname, 'fixtures', 'sample.jpg'));
+
+        expect(res.status).toBe(201);
+        expect(res.body?.data?.description).toEqual(['First line', 'Second line']);
+        expect(res.body?.data?.images?.length).toBe(1);
+    });
+
 });

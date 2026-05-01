@@ -11,6 +11,10 @@ jest.mock('../services/imagekit.service', () => ({
   })),
 }));
 
+jest.mock('../broker/broker', () => ({
+  publishToQueue: jest.fn(async () => undefined),
+}));
+
 const app = require('../app');
 const Product = require('../model/product.model');
 const createAuthMiddleware = require('../middleware/auth.middleware');

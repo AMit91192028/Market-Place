@@ -1,4 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
+import productClient from './productClient'
 import sellerDashboardClient from './sellerDashboardClient'
 import { getApiErrorMessage } from './createServiceClient'
 
@@ -34,6 +35,18 @@ export const getSellerDashboardProducts = createAsyncThunk(
       return Array.isArray(response.data) ? response.data : []
     } catch (error) {
       return rejectWithValue(getApiErrorMessage(error, 'Failed to fetch seller catalog snapshot'))
+    }
+  }
+)
+
+export const createSellerDashboardProduct = createAsyncThunk(
+  'sellerDashboard/createSellerDashboardProduct',
+  async (formData, { rejectWithValue }) => {
+    try {
+      const response = await productClient.post('/', formData)
+      return response.data.data
+    } catch (error) {
+      return rejectWithValue(getApiErrorMessage(error, 'Failed to create product'))
     }
   }
 )

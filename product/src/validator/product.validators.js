@@ -15,13 +15,26 @@ const createProductValidators = [
         .trim()
         .notEmpty()
         .withMessage('title is required'),
+    body('category')
+        .isString()
+        .trim()
+        .notEmpty()
+        .withMessage('category is required'),
     body('description')
         .optional()
-        .isString()
-        .withMessage('description must be a string')
-        .trim()
-        .isLength({ max: 1000 })
-        .withMessage('description max length is 500 characters'),
+        .custom((value) => {
+            if (typeof value === 'string') {
+                return value.trim().length <= 1000;
+            }
+
+            if (Array.isArray(value)) {
+                return value.every((item) => typeof item === 'string') &&
+                    value.join('\n').trim().length <= 1000;
+            }
+
+            return false;
+        })
+        .withMessage('description must be text and no longer than 1000 characters'),
     body('priceAmount')
         .notEmpty()
         .withMessage('priceAmount is required')

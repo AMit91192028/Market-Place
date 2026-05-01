@@ -70,6 +70,21 @@ export function getProductDescription(description) {
   return description || ''
 }
 
+export function normalizeProductDescriptionInput(value) {
+  if (Array.isArray(value)) {
+    return value.map((item) => String(item || '').trim()).filter(Boolean)
+  }
+
+  return String(value || '')
+    .split(/\r?\n/)
+    .map((line) => line.replace(/^\s*[-*]\s*/, '').trim())
+    .filter(Boolean)
+}
+
+export function toProductDescriptionTextarea(value) {
+  return normalizeProductDescriptionInput(value).join('\n')
+}
+
 export function formatProductCategory(category) {
   const value = String(category || '').trim()
 

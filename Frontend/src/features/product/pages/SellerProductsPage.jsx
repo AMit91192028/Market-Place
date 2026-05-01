@@ -2,7 +2,12 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { deleteProduct, getSellerProducts, updateProduct } from '../../../services/api/productApi'
-import { formatCurrency, getProductDescription, getProductImage } from '../../../utils/marketplace'
+import {
+  formatCurrency,
+  getProductImage,
+  normalizeProductDescriptionInput,
+  toProductDescriptionTextarea,
+} from '../../../utils/marketplace'
 import styles from '../styles/Product.module.css'
 
 export default function SellerProductsPage() {
@@ -27,7 +32,7 @@ export default function SellerProductsPage() {
     return drafts[product._id] || {
       title: product.title,
       category: product.category || '',
-      description: getProductDescription(product.description),
+      description: toProductDescriptionTextarea(product.description),
       priceAmount: product.price?.amount || 0,
       stock: product.stock || 0,
     }
@@ -59,7 +64,7 @@ export default function SellerProductsPage() {
           data: {
             title: draft.title,
             category: draft.category,
-            description: draft.description,
+            description: normalizeProductDescriptionInput(draft.description),
             stock: Number(draft.stock),
             price: {
               amount: Number(draft.priceAmount),

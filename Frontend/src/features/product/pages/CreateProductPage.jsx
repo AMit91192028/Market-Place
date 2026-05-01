@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
 import { createProduct } from '../../../services/api/productApi'
+import { normalizeProductDescriptionInput } from '../../../utils/marketplace'
 import styles from '../styles/Product.module.css'
 
 export default function CreateProductPage() {
@@ -24,10 +25,10 @@ export default function CreateProductPage() {
     const formData = new FormData()
     formData.append('title', values.title)
     formData.append('category', values.category)
-    formData.append('description', values.description)
     formData.append('priceAmount', values.priceAmount)
     formData.append('priceCurrency', values.priceCurrency)
     formData.append('stock', values.stock)
+    formData.append('description', normalizeProductDescriptionInput(values.description).join('\n'))
 
     const files = Array.from(values.images || [])
     files.forEach((file) => formData.append('images', file))
@@ -73,7 +74,10 @@ export default function CreateProductPage() {
 
           <label className={styles.fieldBlock}>
             <span>Description</span>
-            <textarea {...register('description')} />
+            <textarea
+              placeholder="Add one product point per line"
+              {...register('description')}
+            />
           </label>
 
           <div className={styles.sellerInlineFields}>

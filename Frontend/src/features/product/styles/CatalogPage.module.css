@@ -8,7 +8,6 @@
 .filterCard,
 .productCard,
 .emptyState,
-.successBanner,
 .errorBanner {
   border-radius: 18px;
   border: 1px solid rgba(15, 23, 42, 0.08);
@@ -19,8 +18,7 @@
 .catalogIntro,
 .filterCard,
 .resultsHeader,
-.productSummary,
-.buyPanel {
+.productBody {
   display: grid;
   gap: 0.85rem;
 }
@@ -86,8 +84,6 @@
 
 .quickRow,
 .activeFilterRow,
-.summaryMeta,
-.cardActions,
 .pagination {
   display: flex;
   gap: 0.75rem;
@@ -96,7 +92,6 @@
 }
 
 .quickChip,
-.primaryButton,
 .secondaryButton,
 .categoryButton {
   border: none;
@@ -120,14 +115,8 @@
   padding: 0.78rem 0.95rem;
 }
 
-.primaryButton,
 .secondaryButton {
   padding: 0.86rem 1.1rem;
-}
-
-.primaryButton {
-  background: linear-gradient(135deg, #2563eb, #38bdf8);
-  color: #ffffff;
 }
 
 .catalogLayout {
@@ -191,107 +180,110 @@
   font-weight: 700;
 }
 
-.listStack {
+.productGrid {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(215px, 235px));
+  justify-content: start;
   gap: 1rem;
 }
 
 .productCard {
   display: grid;
-  grid-template-columns: 220px 1fr 220px;
-  gap: 1.2rem;
-  padding: 1rem;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.94));
+  gap: 0.7rem;
+  padding: 0.7rem;
+  min-width: 0;
+  width: 100%;
+  aspect-ratio: auto;
+  background: #ffffff;
   transition:
-    transform 180ms ease,
-    box-shadow 180ms ease,
-    border-color 180ms ease;
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+  transform-origin: center;
+  overflow: visible;
 }
 
 .productCard:hover {
-  transform: translateY(-2px);
-  border-color: rgba(37, 99, 235, 0.18);
-  box-shadow: 0 18px 38px rgba(37, 99, 235, 0.08);
+  transform: scale(1.03);
+  border-color: rgba(37, 99, 235, 0.16);
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.14);
+}
+
+.productCard:active {
+  transform: scale(0.99);
 }
 
 .productMedia {
   position: relative;
   aspect-ratio: 1 / 1;
-  border-radius: 16px;
   overflow: hidden;
-  background: linear-gradient(180deg, #f8fafc, #eef2f7);
+  background: #f8fafc;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  padding: 0.55rem;
 }
 
 .productMedia img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
-.productBadge {
+.ratingBadge {
   position: absolute;
-  top: 0.8rem;
-  left: 0.8rem;
-  padding: 0.42rem 0.7rem;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.84);
-  color: #ffffff;
-  font-size: 0.74rem;
+  left: 0.55rem;
+  bottom: 0.55rem;
+  padding: 0.24rem 0.48rem;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 0.72rem;
   font-weight: 700;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
 }
 
-.productSummary {
-  align-content: start;
+.productBody {
+  padding: 0 0.1rem 0.1rem;
+  gap: 0.28rem;
+  min-height: 0;
 }
 
-.productSummary h3 {
-  font-size: 1.15rem;
+.productBody h3 {
+  font-size: 0.8rem;
   line-height: 1.35;
-}
-
-.productSummary p {
+  min-height: 2.7em;
   margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.summaryMeta {
-  font-size: 0.86rem;
+.priceRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  flex-wrap: wrap;
 }
 
-.ratingPill {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.35rem 0.65rem;
-  border-radius: 999px;
-  background: rgba(14, 165, 164, 0.14);
-  color: #0f766e;
-  font-size: 0.78rem;
-  font-weight: 700;
-}
-
-.buyPanel {
-  align-content: start;
-  justify-items: start;
-  padding: 0.85rem 0.95rem;
-  border-radius: 16px;
-  background: linear-gradient(180deg, rgba(239, 246, 255, 0.92), rgba(255, 255, 255, 0.98));
-  border: 1px solid rgba(37, 99, 235, 0.12);
-}
-
-.buyPanel strong {
-  font-size: 1.65rem;
+.priceRow strong {
+  font-size: 0.92rem;
   color: #0f172a;
 }
 
 .originalPrice {
   color: #94a3b8;
-  font-size: 0.9rem;
+  font-size: 0.74rem;
   text-decoration: line-through;
 }
 
-.discountText {
-  color: #059669;
-  font-weight: 700;
+.offerText {
+  margin: 0;
+  color: #1d4ed8;
+  font-size: 0.74rem;
+  font-weight: 500;
 }
 
 .emptyState {
@@ -329,26 +321,27 @@
 }
 
 @media (max-width: 1120px) {
-  .catalogLayout,
-  .productCard {
+  .catalogLayout {
     grid-template-columns: 1fr;
   }
 
   .sidebar {
     position: static;
   }
+}
 
-  .buyPanel {
-    justify-items: stretch;
-    padding: 0;
-    background: transparent;
-    border: none;
+@media (max-width: 820px) {
+  .productGrid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   }
 }
 
 @media (max-width: 640px) {
-  .catalogIntro,
-  .productCard {
+  .catalogIntro {
     padding: 1rem;
+  }
+
+  .productGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

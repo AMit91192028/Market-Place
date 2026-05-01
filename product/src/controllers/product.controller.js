@@ -4,9 +4,41 @@ const {uploadImage} = require('../services/imagekit.service');
 // const mongoose = require('mongoose');
 const { publishToQueue } = require("../broker/broker")
 
+function normalizeDescriptionInput(description) {
+    if (Array.isArray(description)) {
+        return description
+            .map((item) => String(item || '').trim())
+            .filter(Boolean);
+    }
+
+    const rawValue = String(description || '').trim();
+
+    if (!rawValue) {
+        return [];
+    }
+
+    if (rawValue.startsWith('[')) {
+        try {
+            const parsedValue = JSON.parse(rawValue);
+
+            if (Array.isArray(parsedValue)) {
+                return parsedValue
+                    .map((item) => String(item || '').trim())
+                    .filter(Boolean);
+            }
+        } catch (error) {
+            // Fall back to line-based normalization below when the payload is not valid JSON.
+        }
+    }
+
+    return rawValue
+        .split(/\r?\n/)
+        .map((line) => line.replace(/^\s*[-*]\s*/, '').trim())
+        .filter(Boolean);
+}
 
 
-// Accepts multipart/form-data with fields: title, description, priceAmount, priceCurrency, images[] (files)
+// Accepts multipart/form-data with fields: title, description[], priceAmount, priceCurrency, images[] (files)
 async function createProduct(req, res) {
     console.log('createProduct called');
     try {
@@ -21,19 +53,21 @@ async function createProduct(req, res) {
 
         const images = await Promise.all((req.files || []).map(file => uploadImage({ buffer: file.buffer })));
 
+        const normalizedDescription = normalizeDescriptionInput(description);
 
         const product = await productModel.create({
             title,
-            description,
+            description: normalizedDescription,
             category,
             price,
             seller,
             images,
             stock: Number(stock) || 0,
         });
+        const productPayload = product.toObject();
 
         await Promise.all([
-            publishToQueue("PRODUCT_SELLER_DASHBOARD.PRODUCT_CREATED",product),
+            publishToQueue("PRODUCT_SELLER_DASHBOARD.PRODUCT_CREATED",productPayload),
             publishToQueue("PRODUCT_NOTIFICATION.PRODUCT_CREATED",{
                 email: req.user.email,
                 username:req.user.username,
@@ -107,16 +141,18 @@ async function updateProduct(req,res){
 
     const allowedUpdates = ['title','description','category','price', 'stock'];
        for (const key of Object.keys(req.body)) {
-        if (allowedUpdates.includes(key)) {
-            if (key === 'price' && typeof req.body.price === 'object') {
-                if (req.body.price.amount !== undefined) {
-                    product.price.amount = Number(req.body.price.amount);
-                }
+            if (allowedUpdates.includes(key)) {
+                if (key === 'price' && typeof req.body.price === 'object') {
+                    if (req.body.price.amount !== undefined) {
+                        product.price.amount = Number(req.body.price.amount);
+                    }
                 if (req.body.price.currency !== undefined) {
                     product.price.currency = req.body.price.currency;
                 }
             } else if (key === 'stock') {
                 product.stock = Number(req.body.stock);
+            } else if (key === 'description') {
+                product.description = normalizeDescriptionInput(req.body.description);
             } else {
                 product[ key ] = req.body[ key ];
             }
@@ -124,6 +160,9 @@ async function updateProduct(req,res){
         }
     }
     await product.save();
+
+    await publishToQueue("PRODUCT_SELLER_DASHBOARD.PRODUCT_UPDATED", product.toObject());
+
     return res.status(200).json({ message: 'Product updated', product });
 }
 
@@ -147,6 +186,7 @@ async function deleteProduct(req,res){
     }
 
     await productModel.findOneAndDelete({_id:id});
+    await publishToQueue("PRODUCT_SELLER_DASHBOARD.PRODUCT_DELETED", { _id: id });
 
     return res.status(200).json({message:'Product deleted',product:{_id:id}})
 }

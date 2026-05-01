@@ -9,7 +9,6 @@ import CartPage from './features/cart/pages/CartPage'
 import CheckoutPage from './features/order/pages/CheckoutPage'
 import MyOrdersPage from './features/order/pages/MyOrdersPage'
 import OrderDetailsPage from './features/order/pages/OrderDetailsPage'
-import CreateProductPage from './features/product/pages/CreateProductPage'
 import ProductDetailsPage from './features/product/pages/ProductDetailsPage'
 import ProductListingPage from './features/product/pages/ProductListingPage'
 import StorefrontHomePage from './features/product/pages/StorefrontHomePage'
@@ -127,7 +126,7 @@ export default function App() {
             path="/seller/products/new"
             element={
               <ProtectedRoute roles={['seller']}>
-                <CreateProductPage />
+                <Navigate to="/seller/products?composer=1" replace />
               </ProtectedRoute>
             }
           />
