@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom'
+import { ToastContainer } from 'react-toastify'
 import Footer from './components/layout/Footer'
 import Navbar from './components/layout/Navbar'
 import AiBuddyChat from './features/ai-buddy/components/AiBuddyChat'
@@ -12,7 +13,9 @@ import OrderDetailsPage from './features/order/pages/OrderDetailsPage'
 import ProductDetailsPage from './features/product/pages/ProductDetailsPage'
 import ProductListingPage from './features/product/pages/ProductListingPage'
 import StorefrontHomePage from './features/product/pages/StorefrontHomePage'
+import SellerCreateProductPage from './features/seller/pages/SellerCreateProductPage'
 import SellerDashboardPage from './features/seller/pages/SellerDashboardPage'
+import './lib/local-toastify/styles.css'
 import './styles/index.css'
 
 function AppLayout() {
@@ -24,6 +27,7 @@ function AppLayout() {
       </main>
       <Footer />
       <AiBuddyChat />
+      <ToastContainer position="top-right" autoClose={2500} newestOnTop pauseOnFocusLoss={false} />
     </div>
   )
 }
@@ -126,7 +130,7 @@ export default function App() {
             path="/seller/products/new"
             element={
               <ProtectedRoute roles={['seller']}>
-                <Navigate to="/seller/products?composer=1" replace />
+                <SellerCreateProductPage />
               </ProtectedRoute>
             }
           />

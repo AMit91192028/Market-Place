@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
+import { toast } from 'react-toastify'
 import { registerUser } from '../../../services/api/authApi'
 import styles from '../styles/Auth.module.css'
 
@@ -39,8 +40,10 @@ export default function RegisterPage() {
         })
       ).unwrap()
 
+      toast.success(`Account created${user?.username ? ` for ${user.username}` : ''}.`)
       navigate(user?.role === 'seller' ? '/seller/products/new' : '/products')
-    } catch {
+    } catch (submitError) {
+      toast.error(submitError || 'Unable to create account.')
       return null
     }
   }

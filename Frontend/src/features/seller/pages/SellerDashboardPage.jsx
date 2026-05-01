@@ -1,8 +1,8 @@
 import { useEffect, useEffectEvent, useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
+import { toast } from 'react-toastify'
 import {
-  createProduct,
   deleteProduct,
   getSellerProducts,
   updateProduct,
@@ -23,7 +23,6 @@ import {
   normalizeProductDescriptionInput,
   toProductDescriptionTextarea,
 } from '../../../utils/marketplace'
-import SellerDashboardCreateProductPanel from '../components/SellerDashboardCreateProductPanel'
 import SellerDashboardInventoryPanel from '../components/SellerDashboardInventoryPanel'
 import SellerDashboardOrdersPanel from '../components/SellerDashboardOrdersPanel'
 import styles from '../styles/SellerDashboard.module.css'
@@ -51,13 +50,31 @@ function getProductDescriptionText(description) {
   return toProductDescriptionTextarea(description)
 }
 
+function mergeProductsById(primaryProducts = [], secondaryProducts = []) {
+  const mergedProducts = new Map()
+
+  secondaryProducts.forEach((product) => {
+    if (product?._id) {
+      mergedProducts.set(String(product._id), product)
+    }
+  })
+
+  primaryProducts.forEach((product) => {
+    if (product?._id) {
+      mergedProducts.set(String(product._id), product)
+    }
+  })
+
+  return Array.from(mergedProducts.values()).sort((left, right) => {
+    return new Date(right?.createdAt || 0).getTime() - new Date(left?.createdAt || 0).getTime()
+  })
+}
+
 export default function SellerDashboardPage() {
   const dispatch = useDispatch()
-  const [searchParams, setSearchParams] = useSearchParams()
   const [drafts, setDrafts] = useState({})
   const [message, setMessage] = useState('')
   const [lastUpdatedAt, setLastUpdatedAt] = useState(null)
-  const [isPublishing, setIsPublishing] = useState(false)
   const [savingProductId, setSavingProductId] = useState('')
   const [deletingProductId, setDeletingProductId] = useState('')
   const [localActionError, setLocalActionError] = useState('')
@@ -74,7 +91,16 @@ export default function SellerDashboardPage() {
     error: sellerDashboardError,
   } = useSelector((state) => state.sellerDashboard)
 
-  const isComposerOpen = searchParams.get('composer') === '1'
+  const refreshSellerReadModels = useEffectEvent(async () => {
+    const results = await Promise.allSettled([
+      dispatch(getSellerMetrics()).unwrap(),
+      dispatch(getSellerOrders()).unwrap(),
+      dispatch(getSellerDashboardProducts()).unwrap(),
+    ])
+
+    setLastUpdatedAt(new Date().toISOString())
+    return results
+  })
 
   const refreshDashboard = useEffectEvent(async () => {
     const results = await Promise.allSettled([
@@ -117,25 +143,32 @@ export default function SellerDashboardPage() {
     }
   }, [sellerProducts])
 
-  const recentMirroredProducts = useMemo(() => {
-    const source = mirroredProducts.length ? mirroredProducts : sellerProducts
-    return source.slice(0, 4)
+  const mergedCatalogProducts = useMemo(() => {
+    return mergeProductsById(sellerProducts, mirroredProducts)
   }, [mirroredProducts, sellerProducts])
+
+  const recentMirroredProducts = useMemo(() => {
+    return mergedCatalogProducts.slice(0, 4)
+  }, [mergedCatalogProducts])
+
+  const mirrorStatusLabel = useMemo(() => {
+    if (isLoadingProducts && mergedCatalogProducts.length > 0) {
+      return `Refreshing mirror, showing ${mergedCatalogProducts.length} live listings`
+    }
+
+    if (mirroredProducts.length > 0) {
+      return `${mirroredProducts.length} mirrored listings`
+    }
+
+    if (sellerProducts.length > 0) {
+      return `Showing ${sellerProducts.length} product-service listings`
+    }
+
+    return isLoadingProducts ? 'Loading seller products...' : 'No synced listings yet'
+  }, [isLoadingProducts, mergedCatalogProducts.length, mirroredProducts.length, sellerProducts.length])
 
   const isRefreshing = isLoadingMetrics || isLoadingOrders || isLoadingProducts || productLoading
   const dashboardError = localActionError || sellerDashboardError || productError
-
-  function setComposerOpen(open) {
-    const nextParams = new URLSearchParams(searchParams)
-
-    if (open) {
-      nextParams.set('composer', '1')
-    } else {
-      nextParams.delete('composer')
-    }
-
-    setSearchParams(nextParams)
-  }
 
   function updateDraft(productId, field, value) {
     setDrafts((current) => ({
@@ -145,41 +178,6 @@ export default function SellerDashboardPage() {
         [field]: value,
       },
     }))
-  }
-
-  async function handleCreateSubmit(values) {
-    setIsPublishing(true)
-    setLocalActionError('')
-    setMessage('')
-
-    const formData = new FormData()
-    formData.append('title', String(values.title || '').trim())
-    formData.append('category', String(values.category || '').trim())
-    formData.append('description', normalizeProductDescriptionInput(values.description))
-    formData.append('priceAmount', String(values.priceAmount ?? ''))
-    formData.append('priceCurrency', String(values.priceCurrency || 'INR'))
-    formData.append('stock', String(values.stock ?? 0))
-
-    Array.from(values.images || []).forEach((file) => {
-      formData.append('images', file)
-    })
-
-    try {
-      const createdProduct = await dispatch(createProduct(formData)).unwrap()
-      const createdTitle = createdProduct?.title || 'Product'
-
-      setMessage(`${createdTitle} created successfully.`)
-      setComposerOpen(false)
-      void refreshDashboard().then((results) => {
-        if (hasRefreshFailures(results)) {
-          setMessage(`${createdTitle} created successfully. Some dashboard cards are still refreshing.`)
-        }
-      })
-    } catch (error) {
-      setLocalActionError(error || 'Unable to create product.')
-    } finally {
-      setIsPublishing(false)
-    }
   }
 
   async function handleSave(productId) {
@@ -213,9 +211,11 @@ export default function SellerDashboardPage() {
         })
       ).unwrap()
 
+      toast.success('Product updated successfully.')
       setMessage('Product updated successfully.')
-      void refreshDashboard()
+      void refreshSellerReadModels()
     } catch (error) {
+      toast.error(error || 'Unable to update product.')
       setLocalActionError(error || 'Unable to update product.')
     } finally {
       setSavingProductId('')
@@ -229,9 +229,11 @@ export default function SellerDashboardPage() {
 
     try {
       await dispatch(deleteProduct(productId)).unwrap()
+      toast.success('Product deleted successfully.')
       setMessage('Product deleted successfully.')
-      void refreshDashboard()
+      void refreshSellerReadModels()
     } catch (error) {
+      toast.error(error || 'Unable to delete product.')
       setLocalActionError(error || 'Unable to delete product.')
     } finally {
       setDeletingProductId('')
@@ -250,9 +252,14 @@ export default function SellerDashboardPage() {
           </p>
 
           <div className={styles.heroActions}>
-            <button type="button" className={styles.primaryButton} onClick={() => setComposerOpen(!isComposerOpen)}>
-              {isComposerOpen ? 'Close product form' : 'Create new product'}
-            </button>
+            <Link
+              to="/seller/products/new"
+              target="_blank"
+              rel="noreferrer"
+              className={styles.primaryButton}
+            >
+              Create new product
+            </Link>
             <a href="#inventory-editor" className={styles.secondaryButton}>
               Manage inventory
             </a>
@@ -317,15 +324,6 @@ export default function SellerDashboardPage() {
       {message ? <div className={styles.successBanner}>{message}</div> : null}
       {dashboardError ? <div className={styles.errorBanner}>{dashboardError}</div> : null}
 
-      {isComposerOpen ? (
-        <SellerDashboardCreateProductPanel
-          styles={styles}
-          onSubmit={handleCreateSubmit}
-          isPublishing={isPublishing}
-          onCancel={() => setComposerOpen(false)}
-        />
-      ) : null}
-
       <div className={styles.overviewGrid}>
         <article className={styles.overviewCard}>
           <span>Seller revenue</span>
@@ -369,10 +367,23 @@ export default function SellerDashboardPage() {
               <span className={styles.panelEyebrow}>Mirrored Catalog</span>
               <h2>Seller-dashboard service product mirror</h2>
             </div>
-            <span className={styles.panelMeta}>
-              {isLoadingProducts ? 'Loading mirrored products...' : `${mirroredProducts.length} mirrored listings`}
-            </span>
+            <span className={styles.panelMeta}>{mirrorStatusLabel}</span>
           </div>
+
+          {recentMirroredProducts.length ? (
+            <div className={styles.catalogPreviewGrid}>
+              {recentMirroredProducts.map((product) => (
+                <article key={product._id} className={styles.previewCard}>
+                  <img src={getProductImage(product)} alt={product.title} />
+                  <div>
+                    <strong>{product.title}</strong>
+                    <span>{formatProductCategory(product.category)}</span>
+                    <span>{formatCurrency(product.price?.amount, product.price?.currency || 'INR')}</span>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : null}
 
           <div className={styles.topList}>
             {metrics.topProducts?.length ? (
@@ -385,25 +396,20 @@ export default function SellerDashboardPage() {
                   <span className={styles.topBadge}>{product.sold} sold</span>
                 </div>
               ))
+            ) : recentMirroredProducts.length ? (
+              <div className={styles.emptyStateCompact}>
+                <strong>Products are available</strong>
+                <span>
+                  Orders have not ranked top sellers yet, but your current product-service listings are
+                  shown above.
+                </span>
+              </div>
             ) : (
               <div className={styles.emptyStateCompact}>
                 <strong>No top products yet</strong>
                 <span>Top sellers will appear here after product-linked orders are created.</span>
               </div>
             )}
-          </div>
-
-          <div className={styles.catalogPreviewGrid}>
-            {recentMirroredProducts.map((product) => (
-              <article key={product._id} className={styles.previewCard}>
-                <img src={getProductImage(product)} alt={product.title} />
-                <div>
-                  <strong>{product.title}</strong>
-                  <span>{formatProductCategory(product.category)}</span>
-                  <span>{formatCurrency(product.price?.amount, product.price?.currency || 'INR')}</span>
-                </div>
-              </article>
-            ))}
           </div>
 
           {!isLoadingProducts && recentMirroredProducts.length === 0 ? (

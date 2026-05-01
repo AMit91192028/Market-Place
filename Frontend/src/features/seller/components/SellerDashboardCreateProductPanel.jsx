@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 const defaultValues = {
@@ -25,8 +25,26 @@ export default function SellerDashboardCreateProductPanel({
   } = useForm({ defaultValues })
 
   const selectedImages = watch('images')
+  const [previewUrls, setPreviewUrls] = useState([])
+
   const selectedImageNames = useMemo(() => {
     return Array.from(selectedImages || []).map((file) => file.name)
+  }, [selectedImages])
+
+  useEffect(() => {
+    const files = Array.from(selectedImages || [])
+    const nextPreviewUrls = files.map((file) => ({
+      name: file.name,
+      url: URL.createObjectURL(file),
+    }))
+
+    setPreviewUrls(nextPreviewUrls)
+
+    return () => {
+      nextPreviewUrls.forEach((preview) => {
+        URL.revokeObjectURL(preview.url)
+      })
+    }
   }, [selectedImages])
 
   return (
@@ -128,6 +146,17 @@ export default function SellerDashboardCreateProductPanel({
               : 'Optional. Add up to 5 product images.'}
           </small>
         </label>
+
+        {previewUrls.length ? (
+          <div className={styles.previewGrid}>
+            {previewUrls.map((preview) => (
+              <figure key={preview.url} className={styles.previewCard}>
+                <img src={preview.url} alt={preview.name} />
+                <figcaption>{preview.name}</figcaption>
+              </figure>
+            ))}
+          </div>
+        ) : null}
 
         <div className={styles.cardActions}>
           <button type="submit" className={styles.primaryButton} disabled={isPublishing}>

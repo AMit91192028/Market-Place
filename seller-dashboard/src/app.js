@@ -7,7 +7,7 @@ const sellerRoutes = require('./router/seller.routes')
 const app = express();
 
 app.use(cors({
-  origin: ['http://localhost:5173','https://market-place-git-main-amit91192028s-projects.vercel.app'],
+  origin: 'https://market-place-git-main-amit91192028s-projects.vercel.app',
   credentials: true
 }));
 app.use(express.json());

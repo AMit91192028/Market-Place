@@ -258,7 +258,11 @@ async function getProductsBySeller(req,res){
 
     const{skip=0 , limit = 20} = req.query;
 
-    const products = await productModel.find({seller:seller.id}).skip(skip).limit(Math.min(limit,20));
+    const products = await productModel
+        .find({seller:seller.id})
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(Math.min(limit,20));
 
     return res.status(200).json({data:products});
 

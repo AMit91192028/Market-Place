@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
+import { toast } from 'react-toastify'
 import { loginUser } from '../../../services/api/authApi'
 import styles from '../styles/Auth.module.css'
 
@@ -27,8 +28,10 @@ export default function LoginPage() {
 
     try {
       const user = await dispatch(loginUser(payload)).unwrap()
+      toast.success(`Welcome back${user?.username ? `, ${user.username}` : ''}.`)
       navigate(user?.role === 'seller' ? '/seller/products' : '/products')
-    } catch {
+    } catch (submitError) {
+      toast.error(submitError || 'Unable to sign in.')
       return null
     }
   }

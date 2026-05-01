@@ -309,7 +309,13 @@ export default function Navbar() {
             ) : null}
 
             {role === 'seller' ? (
-              <Link to="/seller/products/new" className={styles.actionLink} onClick={() => setAccountOpen(false)}>
+              <Link
+                to="/seller/products/new"
+                target="_blank"
+                rel="noreferrer"
+                className={styles.actionLink}
+                onClick={() => setAccountOpen(false)}
+              >
                 Add product
               </Link>
             ) : null}
