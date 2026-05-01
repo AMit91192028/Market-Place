@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { getProducts } from '../../../services/api/productApi'
@@ -12,37 +12,40 @@ import {
 } from '../../../utils/marketplace'
 import styles from '../styles/CatalogPage.module.css'
 
+const PAGE_SIZE = 18
+
 const QUICK_FILTERS = [
-  { label: 'All products', params: { q: '', minprice: '', maxprice: '', category: '' } },
-  { label: 'Budget buys', params: { q: '', minprice: '', maxprice: '999', category: '' } },
-  { label: 'Premium edit', params: { q: '', minprice: '1500', maxprice: '', category: '' } },
+  { label: 'All products', params: { q: '', minprice: '', maxprice: '', category: '', sort: 'featured' } },
+  { label: 'Budget buys', params: { q: '', minprice: '', maxprice: '999', category: '', sort: 'price-low' } },
+  { label: 'Premium edit', params: { q: '', minprice: '1500', maxprice: '', category: '', sort: 'price-high' } },
 ]
 
 export default function ProductListingPage() {
   const dispatch = useDispatch()
-  const { products, isLoading, error } = useSelector((state) => state.product)
+  const { products, productMeta, isLoading, error } = useSelector((state) => state.product)
   const [searchParams, setSearchParams] = useSearchParams()
-  const [sort, setSort] = useState('featured')
 
   const query = searchParams.get('q') || ''
   const category = searchParams.get('category') || ''
   const minprice = searchParams.get('minprice') || ''
   const maxprice = searchParams.get('maxprice') || ''
-  const page = Number(searchParams.get('page') || '1')
-  const hasCategoryFilter = Boolean(category)
-  const requestLimit = hasCategoryFilter ? 24 : 18
+  const sort = searchParams.get('sort') || 'featured'
+  const rawPage = Number(searchParams.get('page') || '1')
+  const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1
 
   useEffect(() => {
     dispatch(
       getProducts({
         q: query || undefined,
+        category: category || undefined,
         minprice: minprice || undefined,
         maxprice: maxprice || undefined,
-        skip: hasCategoryFilter ? 0 : (page - 1) * 18,
-        limit: requestLimit,
+        sort,
+        skip: Math.max(page - 1, 0) * PAGE_SIZE,
+        limit: PAGE_SIZE,
       })
     )
-  }, [dispatch, hasCategoryFilter, maxprice, minprice, page, query, requestLimit])
+  }, [category, dispatch, maxprice, minprice, page, query, sort])
 
   const availableCategories = useMemo(() => {
     return Array.from(
@@ -54,26 +57,8 @@ export default function ProductListingPage() {
     )
   }, [products])
 
-  const visibleProducts = useMemo(() => {
-    let nextProducts = [...products]
-
-    if (category) {
-      nextProducts = nextProducts.filter(
-        (product) => formatProductCategory(product.category).toLowerCase() === category.toLowerCase()
-      )
-    }
-
-    switch (sort) {
-      case 'price-low':
-        return nextProducts.sort((left, right) => (left.price?.amount || 0) - (right.price?.amount || 0))
-      case 'price-high':
-        return nextProducts.sort((left, right) => (right.price?.amount || 0) - (left.price?.amount || 0))
-      case 'stock':
-        return nextProducts.sort((left, right) => (right.stock || 0) - (left.stock || 0))
-      default:
-        return nextProducts
-    }
-  }, [category, products, sort])
+  const visibleProducts = products
+  const totalPages = Math.max(1, Math.ceil((productMeta.total || 0) / PAGE_SIZE))
 
   function updateFilters(nextValues) {
     const params = new URLSearchParams(searchParams)
@@ -178,7 +163,7 @@ export default function ProductListingPage() {
 
             <label className={styles.field}>
               <span>Sort by</span>
-              <select value={sort} onChange={(event) => setSort(event.target.value)}>
+              <select value={sort} onChange={(event) => updateFilters({ sort: event.target.value })}>
                 <option value="featured">Featured</option>
                 <option value="price-low">Price: Low to high</option>
                 <option value="price-high">Price: High to low</option>
@@ -194,8 +179,8 @@ export default function ProductListingPage() {
               <span className={styles.eyebrow}>Catalog results</span>
               <h2>
                 {category
-                  ? `${visibleProducts.length} result${visibleProducts.length === 1 ? '' : 's'} in ${category}`
-                  : `${visibleProducts.length} products ready to browse`}
+                  ? `${productMeta.total} result${productMeta.total === 1 ? '' : 's'} in ${category}`
+                  : `${productMeta.total} products ready to browse`}
               </h2>
               <p>
                 {query
@@ -259,15 +244,15 @@ export default function ProductListingPage() {
       <div className={styles.pagination}>
         <button
           className={styles.secondaryButton}
-          disabled={page <= 1 || hasCategoryFilter}
+          disabled={page <= 1}
           onClick={() => changePage(page - 1)}
         >
           Previous
         </button>
-        <span>{hasCategoryFilter ? 'Category view' : `Page ${page}`}</span>
+        <span>{`Page ${Math.min(page, totalPages)} of ${totalPages}`}</span>
         <button
           className={styles.secondaryButton}
-          disabled={products.length < requestLimit || hasCategoryFilter}
+          disabled={!productMeta.hasMore}
           onClick={() => changePage(page + 1)}
         >
           Next

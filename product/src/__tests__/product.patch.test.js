@@ -89,7 +89,7 @@ describe('PATCH /api/products/:id (seller)', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.product.title).toBe('Updated Title');
-    expect(res.body.product.description).toEqual(['Updated desc']);
+    expect(res.body.product.description).toBe('Updated desc');
     expect(res.body.product.price.amount).toBe(25);
   });
 
@@ -162,7 +162,7 @@ describe('PATCH /api/products/:id (seller)', () => {
       .send({ description: 'new desc' });
 
     expect(res.status).toBe(200);
-    expect(res.body.product.description).toEqual(['new desc']);
+    expect(res.body.product.description).toBe('new desc');
     expect(res.body.product.title).toBe('Partial');
     expect(res.body.product.price.amount).toBe(30);
   });

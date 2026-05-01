@@ -64,7 +64,7 @@ export function getProductImage(product) {
 
 export function getProductDescription(description) {
   if (Array.isArray(description)) {
-    return description.filter(Boolean).join(' ')
+    return description.filter(Boolean).join('\n')
   }
 
   return description || ''
@@ -72,17 +72,18 @@ export function getProductDescription(description) {
 
 export function normalizeProductDescriptionInput(value) {
   if (Array.isArray(value)) {
-    return value.map((item) => String(item || '').trim()).filter(Boolean)
+    return value.map((item) => String(item || '').trim()).filter(Boolean).join('\n')
   }
 
   return String(value || '')
     .split(/\r?\n/)
     .map((line) => line.replace(/^\s*[-*]\s*/, '').trim())
     .filter(Boolean)
+    .join('\n')
 }
 
 export function toProductDescriptionTextarea(value) {
-  return normalizeProductDescriptionInput(value).join('\n')
+  return getProductDescription(value)
 }
 
 export function formatProductCategory(category) {

@@ -2,12 +2,29 @@ import { createAsyncThunk } from '@reduxjs/toolkit'
 import productClient from './productClient'
 import { getApiErrorMessage } from './createServiceClient'
 
+function normalizeProductCollectionResponse(responseData, params = {}) {
+  const items = Array.isArray(responseData?.data) ? responseData.data : []
+  const requestedSkip = Number(params?.skip || 0)
+  const requestedLimit = Number(params?.limit || items.length || 0)
+  const meta = responseData?.meta || {}
+
+  return {
+    items,
+    meta: {
+      total: Number(meta.total ?? items.length),
+      skip: Number(meta.skip ?? requestedSkip),
+      limit: Number(meta.limit ?? requestedLimit),
+      hasMore: Boolean(meta.hasMore ?? false),
+    },
+  }
+}
+
 export const getProducts = createAsyncThunk(
   'product/getProducts',
   async (params = {}, { rejectWithValue }) => {
     try {
       const response = await productClient.get('/', { params })
-      return response.data.data || []
+      return normalizeProductCollectionResponse(response.data, params)
     } catch (error) {
       return rejectWithValue(getApiErrorMessage(error, 'Failed to fetch products'))
     }

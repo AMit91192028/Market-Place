@@ -28,7 +28,7 @@ export default function CreateProductPage() {
     formData.append('priceAmount', values.priceAmount)
     formData.append('priceCurrency', values.priceCurrency)
     formData.append('stock', values.stock)
-    formData.append('description', normalizeProductDescriptionInput(values.description).join('\n'))
+    formData.append('description', normalizeProductDescriptionInput(values.description))
 
     const files = Array.from(values.images || [])
     files.forEach((file) => formData.append('images', file))

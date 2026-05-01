@@ -2,12 +2,12 @@ import { useEffect, useEffectEvent, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import {
+  createProduct,
   deleteProduct,
   getSellerProducts,
   updateProduct,
 } from '../../../services/api/productApi'
 import {
-  createSellerDashboardProduct,
   getSellerDashboardProducts,
   getSellerMetrics,
   getSellerOrders,
@@ -15,12 +15,16 @@ import {
 import {
   formatCurrency,
   formatDateTime,
+  normalizeProductDescriptionInput,
   formatProductCategory,
   formatStatusLabel,
   getOrderValue,
   getProductImage,
   getUserDisplayName,
 } from '../../../utils/marketplace'
+import SellerDashboardCreateProductPanel from '../components/SellerDashboardCreateProductPanel'
+import SellerDashboardInventoryPanel from '../components/SellerDashboardInventoryPanel'
+import SellerDashboardRecentOrdersPanel from '../components/SellerDashboardRecentOrdersPanel'
 import styles from '../styles/SellerDashboard.module.css'
 
 const LIVE_REFRESH_MS = 30000
@@ -93,11 +97,11 @@ function clampLabel(value = '', maxLength = 16) {
 }
 
 function getProductDescriptionText(description) {
-  if (Array.isArray(description)) {
-    return description.join('\n')
-  }
+  return typeof description === 'string' ? description : description || ''
+}
 
-  return description || ''
+function hasRefreshFailures(results = []) {
+  return results.some((result) => result.status === 'rejected')
 }
 
 function buildDailyPerformance(orders = []) {
@@ -231,21 +235,22 @@ export default function SellerDashboardPage() {
 
   const isComposerOpen = searchParams.get('composer') === '1'
   const refreshDashboard = useEffectEvent(async () => {
-    await Promise.all([
-      dispatch(getSellerMetrics()),
-      dispatch(getSellerOrders()),
-      dispatch(getSellerDashboardProducts()),
-      dispatch(getSellerProducts()),
+    const results = await Promise.allSettled([
+      dispatch(getSellerMetrics()).unwrap(),
+      dispatch(getSellerOrders()).unwrap(),
+      dispatch(getSellerDashboardProducts()).unwrap(),
+      dispatch(getSellerProducts()).unwrap(),
     ])
 
     setLastUpdatedAt(new Date().toISOString())
+    return results
   })
 
   useEffect(() => {
-    refreshDashboard()
+    void refreshDashboard()
 
     const intervalId = window.setInterval(() => {
-      refreshDashboard()
+      void refreshDashboard()
     }, LIVE_REFRESH_MS)
 
     return () => {
@@ -344,18 +349,24 @@ export default function SellerDashboardPage() {
     formData.append('priceAmount', createDraft.priceAmount)
     formData.append('priceCurrency', createDraft.priceCurrency)
     formData.append('stock', createDraft.stock)
-    formData.append('description', createDraft.description.trim())
+    formData.append('description', normalizeProductDescriptionInput(createDraft.description).join('\n'))
 
     Array.from(createDraft.images || []).forEach((file) => {
       formData.append('images', file)
     })
 
     try {
-      await dispatch(createSellerDashboardProduct(formData)).unwrap()
-      setMessage('Product created and seller dashboard refreshed.')
+      const createdProduct = await dispatch(createProduct(formData)).unwrap()
+      const refreshResults = await refreshDashboard()
+      const createdLabel = createdProduct?.title || 'Product'
+
+      setMessage(
+        hasRefreshFailures(refreshResults)
+          ? `${createdLabel} was created, but one or more dashboard panels are still refreshing.`
+          : `${createdLabel} created and seller dashboard refreshed.`
+      )
       setCreateDraft(EMPTY_CREATE_DRAFT)
       setComposerOpen(false)
-      await refreshDashboard()
     } catch (createError) {
       setMessage(createError || 'Unable to create this product.')
     } finally {
@@ -382,7 +393,7 @@ export default function SellerDashboardPage() {
           data: {
             title: draft.title,
             category: draft.category,
-            description: draft.description.trim(),
+            description: normalizeProductDescriptionInput(draft.description),
             stock: Number(draft.stock),
             price: {
               amount: Number(draft.priceAmount),
@@ -392,8 +403,12 @@ export default function SellerDashboardPage() {
         })
       ).unwrap()
 
-      setMessage('Inventory updated and seller dashboard refreshed.')
-      await refreshDashboard()
+      const refreshResults = await refreshDashboard()
+      setMessage(
+        hasRefreshFailures(refreshResults)
+          ? 'Inventory updated, but one or more dashboard panels are still refreshing.'
+          : 'Inventory updated and seller dashboard refreshed.'
+      )
     } catch (updateError) {
       setMessage(updateError || 'Unable to update this product.')
     } finally {
@@ -406,8 +421,12 @@ export default function SellerDashboardPage() {
 
     try {
       await dispatch(deleteProduct(productId)).unwrap()
-      setMessage('Product deleted and seller dashboard refreshed.')
-      await refreshDashboard()
+      const refreshResults = await refreshDashboard()
+      setMessage(
+        hasRefreshFailures(refreshResults)
+          ? 'Product deleted, but one or more dashboard panels are still refreshing.'
+          : 'Product deleted and seller dashboard refreshed.'
+      )
     } catch (deleteError) {
       setMessage(deleteError || 'Unable to delete this product.')
     } finally {
@@ -501,101 +520,14 @@ export default function SellerDashboardPage() {
       {dashboardError ? <div className={styles.errorBanner}>{dashboardError}</div> : null}
 
       {isComposerOpen ? (
-        <article className={`${styles.panel} ${styles.createComposer}`} id="seller-create-form">
-          <div className={styles.panelHeader}>
-            <div>
-              <span className={styles.panelLabel}>Add product</span>
-              <h2>Create a new seller listing</h2>
-            </div>
-            <span className={styles.panelMeta}>Description is sent as plain text.</span>
-          </div>
-
-          <form className={styles.createForm} onSubmit={handleCreateSubmit}>
-            <label className={styles.fieldBlock}>
-              <span>Product title</span>
-              <input
-                type="text"
-                value={createDraft.title}
-                onChange={(event) => updateCreateDraft('title', event.target.value)}
-                required
-              />
-            </label>
-
-            <label className={styles.fieldBlock}>
-              <span>Category</span>
-              <input
-                type="text"
-                placeholder="Ex: electronics, fashion, home"
-                value={createDraft.category}
-                onChange={(event) => updateCreateDraft('category', event.target.value)}
-                required
-              />
-            </label>
-
-            <label className={styles.fieldBlock}>
-              <span>Description</span>
-              <textarea
-                placeholder="Write a short product description"
-                value={createDraft.description}
-                onChange={(event) => updateCreateDraft('description', event.target.value)}
-              />
-            </label>
-
-            <div className={styles.inlineFields}>
-              <label className={styles.fieldBlock}>
-                <span>Price amount</span>
-                <input
-                  type="number"
-                  min="1"
-                  value={createDraft.priceAmount}
-                  onChange={(event) => updateCreateDraft('priceAmount', event.target.value)}
-                  required
-                />
-              </label>
-
-              <label className={styles.fieldBlock}>
-                <span>Currency</span>
-                <select
-                  value={createDraft.priceCurrency}
-                  onChange={(event) => updateCreateDraft('priceCurrency', event.target.value)}
-                >
-                  <option value="INR">INR</option>
-                  <option value="USD">USD</option>
-                </select>
-              </label>
-
-              <label className={styles.fieldBlock}>
-                <span>Stock</span>
-                <input
-                  type="number"
-                  min="0"
-                  value={createDraft.stock}
-                  onChange={(event) => updateCreateDraft('stock', event.target.value)}
-                  required
-                />
-              </label>
-            </div>
-
-            <label className={styles.fieldBlock}>
-              <span>Images</span>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={(event) => updateCreateDraft('images', Array.from(event.target.files || []))}
-              />
-            </label>
-
-            <div className={styles.cardActions}>
-              <button type="submit" className={styles.primaryButton} disabled={isPublishing}>
-                {isPublishing ? 'Publishing...' : 'Publish product'}
-              </button>
-              <button type="button" className={styles.secondaryButton} onClick={() => setComposerOpen(false)}>
-                Cancel
-              </button>
-            </div>
-          </form>
-        </article>
+        <SellerDashboardCreateProductPanel
+          styles={styles}
+          createDraft={createDraft}
+          updateCreateDraft={updateCreateDraft}
+          handleCreateSubmit={handleCreateSubmit}
+          isPublishing={isPublishing}
+          setComposerOpen={setComposerOpen}
+        />
       ) : null}
 
       <div className={styles.overviewGrid}>
@@ -690,91 +622,19 @@ export default function SellerDashboardPage() {
       </article>
 
       <div className={styles.contentGrid}>
-        <article className={styles.panel}>
-          <div className={styles.panelHeader}>
-            <div>
-              <span className={styles.panelLabel}>Recent seller orders</span>
-              <h2>Order stream tied to your products</h2>
-            </div>
-            <span className={styles.panelMeta}>
-              {isLoadingOrders ? 'Syncing orders...' : `${orders.length} seller orders`}
-            </span>
-          </div>
-
-          {statusSummary.length ? (
-            <div className={styles.statusRow}>
-              {statusSummary.map((item) => (
-                <span key={item.status} className={styles.summaryChip}>
-                  {formatStatusLabel(item.status)}: {item.count}
-                </span>
-              ))}
-            </div>
-          ) : null}
-
-          <div className={styles.orderList}>
-            {isLoadingOrders
-              ? Array.from({ length: 3 }).map((_, index) => <article key={index} className={styles.orderSkeleton} />)
-              : orders.slice(0, 6).map((order) => (
-                  <article key={order._id} className={styles.orderCard}>
-                    <div className={styles.orderHeader}>
-                      <div>
-                        <strong>{getUserDisplayName(order.user)}</strong>
-                        <span>{order.user?.email || 'Customer account'}</span>
-                      </div>
-                      <div className={styles.badgeStack}>
-                        <span className={`${styles.statusBadge} ${styles.statusNeutral}`}>
-                          {formatStatusLabel(order.status)}
-                        </span>
-                        <span
-                          className={`${styles.statusBadge} ${getPaymentBadgeClass(
-                            order.paymentStatus,
-                            styles
-                          )}`}
-                        >
-                          {formatStatusLabel(order.paymentStatus)}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className={styles.orderMeta}>
-                      <div>
-                        <span>Order value</span>
-                        <strong>
-                          {formatCurrency(
-                            getOrderValue(order),
-                            order.paymentAmount?.currency || order.totalPrice?.currency || 'INR'
-                          )}
-                        </strong>
-                      </div>
-                      <div>
-                        <span>Created</span>
-                        <strong>{formatDateTime(order.createdAt)}</strong>
-                      </div>
-                      <div>
-                        <span>Items</span>
-                        <strong>{order.items.length}</strong>
-                      </div>
-                    </div>
-
-                    <div className={styles.itemChips}>
-                      {order.items.slice(0, 4).map((item) => (
-                        <span key={`${order._id}-${item.product}`}>
-                          {item.quantity} x{' '}
-                          {productNameById[String(item.product)] || `Product ${String(item.product).slice(-6)}`}
-                        </span>
-                      ))}
-                    </div>
-                  </article>
-                ))}
-
-            {!isLoadingOrders && orders.length === 0 ? (
-              <div className={styles.emptyPanel}>
-                <h3>No seller orders yet</h3>
-                <p>Orders will appear here as soon as customers start checking out your products.</p>
-              </div>
-            ) : null}
-          </div>
-        </article>
+        <SellerDashboardRecentOrdersPanel
+          styles={styles}
+          isLoadingOrders={isLoadingOrders}
+          orders={orders}
+          statusSummary={statusSummary}
+          formatStatusLabel={formatStatusLabel}
+          getUserDisplayName={getUserDisplayName}
+          getPaymentBadgeClass={getPaymentBadgeClass}
+          formatCurrency={formatCurrency}
+          getOrderValue={getOrderValue}
+          formatDateTime={formatDateTime}
+          productNameById={productNameById}
+        />
 
         <article className={styles.panel}>
           <div className={styles.panelHeader}>
@@ -823,116 +683,18 @@ export default function SellerDashboardPage() {
         </article>
       </div>
 
-      <article className={styles.panel} id="inventory-editor">
-        <div className={styles.panelHeader}>
-          <div>
-            <span className={styles.panelLabel}>Inventory editor</span>
-            <h2>Live product management</h2>
-          </div>
-          <span className={styles.panelMeta}>
-            {productLoading ? 'Refreshing inventory...' : `${sellerProducts.length} editable listings`}
-          </span>
-        </div>
-
-        <div className={styles.inventoryGrid}>
-          {productLoading
-            ? Array.from({ length: 2 }).map((_, index) => <article key={index} className={styles.inventorySkeleton} />)
-            : sellerProducts.map((product) => {
-                const draft = drafts[product._id] || {
-                  title: product.title,
-                  category: product.category || '',
-                  description: getProductDescriptionText(product.description),
-                  priceAmount: product.price?.amount || 0,
-                  stock: product.stock || 0,
-                }
-
-                return (
-                  <article key={product._id} className={styles.inventoryCard}>
-                    <div className={styles.inventoryMedia}>
-                      <img src={getProductImage(product)} alt={product.title} />
-                      <span className={styles.inventoryBadge}>
-                        {Number(product.stock || 0) > 0 ? `${product.stock} in stock` : 'Out of stock'}
-                      </span>
-                    </div>
-
-                    <div className={styles.inventoryBody}>
-                      <label className={styles.fieldBlock}>
-                        <span>Title</span>
-                        <input
-                          type="text"
-                          value={draft.title || ''}
-                          onChange={(event) => updateDraft(product._id, 'title', event.target.value)}
-                        />
-                      </label>
-
-                      <label className={styles.fieldBlock}>
-                        <span>Category</span>
-                        <input
-                          type="text"
-                          value={draft.category || ''}
-                          onChange={(event) => updateDraft(product._id, 'category', event.target.value)}
-                        />
-                      </label>
-
-                      <label className={styles.fieldBlock}>
-                        <span>Description</span>
-                        <textarea
-                          value={draft.description || ''}
-                          onChange={(event) => updateDraft(product._id, 'description', event.target.value)}
-                        />
-                      </label>
-
-                      <div className={styles.inlineFields}>
-                        <label className={styles.fieldBlock}>
-                          <span>Price</span>
-                          <input
-                            type="number"
-                            min="0"
-                            value={draft.priceAmount || 0}
-                            onChange={(event) => updateDraft(product._id, 'priceAmount', event.target.value)}
-                          />
-                        </label>
-
-                        <label className={styles.fieldBlock}>
-                          <span>Stock</span>
-                          <input
-                            type="number"
-                            min="0"
-                            value={draft.stock || 0}
-                            onChange={(event) => updateDraft(product._id, 'stock', event.target.value)}
-                          />
-                        </label>
-                      </div>
-
-                      <div className={styles.cardActions}>
-                        <button
-                          className={styles.primaryButton}
-                          onClick={() => handleSave(product._id)}
-                          disabled={savingProductId === product._id}
-                        >
-                          {savingProductId === product._id ? 'Saving...' : 'Save changes'}
-                        </button>
-                        <button
-                          className={styles.dangerButton}
-                          onClick={() => handleDelete(product._id)}
-                          disabled={deletingProductId === product._id}
-                        >
-                          {deletingProductId === product._id ? 'Deleting...' : 'Delete'}
-                        </button>
-                      </div>
-                    </div>
-                  </article>
-                )
-              })}
-        </div>
-
-        {!productLoading && sellerProducts.length === 0 ? (
-          <div className={styles.emptyPanel}>
-            <h3>No seller products yet</h3>
-            <p>Create your first listing to activate seller metrics and live inventory controls.</p>
-          </div>
-        ) : null}
-      </article>
+      <SellerDashboardInventoryPanel
+        styles={styles}
+        productLoading={productLoading}
+        sellerProducts={sellerProducts}
+        drafts={drafts}
+        updateDraft={updateDraft}
+        handleSave={handleSave}
+        handleDelete={handleDelete}
+        savingProductId={savingProductId}
+        deletingProductId={deletingProductId}
+        getProductDescriptionText={getProductDescriptionText}
+      />
     </section>
   )
 }

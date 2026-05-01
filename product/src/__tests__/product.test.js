@@ -55,7 +55,7 @@ describe('POST /api/products', () => {
         expect(res.status).toBe(201);
         expect(res.body?.data?.title).toBe('Test Product');
         expect(res.body?.data?.category).toBe('electronics');
-        expect(res.body?.data?.description).toEqual(['Nice one']);
+        expect(res.body?.data?.description).toBe('Nice one');
         expect(res.body?.data?.price?.amount).toBe(99.99);
         expect(res.body?.data?.images?.length).toBe(1);
         expect(res.body?.data?.images[ 0 ]?.url).toContain('https://ik.mock/');
@@ -75,7 +75,7 @@ describe('POST /api/products', () => {
             .attach('images', path.join(__dirname, 'fixtures', 'sample.jpg'));
 
         expect(res.status).toBe(201);
-        expect(res.body?.data?.description).toEqual(['First line', 'Second line']);
+        expect(res.body?.data?.description).toBe('First line\nSecond line');
         expect(res.body?.data?.images?.length).toBe(1);
     });
 

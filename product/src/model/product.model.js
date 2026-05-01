@@ -6,10 +6,11 @@ const productSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    description:{
-        type: String,
-        trim: true,
-    },
+    description:
+        {
+            type: String,
+            trim: true,
+        },
     category: {
       type: String,
       required: true,
@@ -40,9 +41,9 @@ const productSchema = new mongoose.Schema({
         type:Number,
         default:0
     }
-
-
-
+},
+{
+    timestamps: true
 })
 
 productSchema.index({title:'text',description:'text', category: 1,});

@@ -103,5 +103,63 @@ describe('GET /api/products', () => {
     expect(res.body.data.some(p => p.title === 'Expensive')).toBe(false);
   });
 
+  it('filters by category case-insensitively', async () => {
+    await Product.create({
+      title: 'Laptop',
+      category: 'electronics',
+      price: { amount: 500, currency: 'USD' },
+      seller: new mongoose.Types.ObjectId().toHexString(),
+    });
+
+    await Product.create({
+      title: 'Jacket',
+      category: 'fashion',
+      price: { amount: 120, currency: 'USD' },
+      seller: new mongoose.Types.ObjectId().toHexString(),
+    });
+
+    const res = await request(app).get('/api/products').query({ category: 'Electronics' });
+    expect(res.status).toBe(200);
+    expect(res.body.data).toHaveLength(1);
+    expect(res.body.data[0].title).toBe('Laptop');
+  });
+
+  it('supports sorted pagination metadata', async () => {
+    await Product.create({
+      title: 'Mid',
+      category: 'electronics',
+      price: { amount: 30, currency: 'USD' },
+      stock: 3,
+      seller: new mongoose.Types.ObjectId().toHexString(),
+    });
+
+    await Product.create({
+      title: 'Low',
+      category: 'electronics',
+      price: { amount: 10, currency: 'USD' },
+      stock: 8,
+      seller: new mongoose.Types.ObjectId().toHexString(),
+    });
+
+    await Product.create({
+      title: 'High',
+      category: 'electronics',
+      price: { amount: 90, currency: 'USD' },
+      stock: 1,
+      seller: new mongoose.Types.ObjectId().toHexString(),
+    });
+
+    const res = await request(app).get('/api/products').query({ sort: 'price-low', skip: 1, limit: 1 });
+    expect(res.status).toBe(200);
+    expect(res.body.data).toHaveLength(1);
+    expect(res.body.data[0].title).toBe('Mid');
+    expect(res.body.meta).toEqual({
+      total: 3,
+      skip: 1,
+      limit: 1,
+      hasMore: true,
+    });
+  });
+
   
 });
