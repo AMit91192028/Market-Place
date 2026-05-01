@@ -8,7 +8,7 @@ async function getMetrics(req, res) {
         const seller = req.user;
 
         // Get all products for this seller
-        const products = await productModel.find({ seller: seller._id });
+        const products = await productModel.find({ seller: seller.id });
         const productIds = products.map(p => p._id);
         const productIdSet = new Set(productIds.map((productId) => String(productId)));
 

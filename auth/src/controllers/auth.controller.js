@@ -208,17 +208,13 @@ async function deleteUserAdresses(req, res){
     }
 
 async function logoutUser(req,res){
-    const token = req.cookies.token;
+    const token = req.cookies?.token || req.headers?.authorization?.split(' ')[1];
 
     if(token){
         await redis.set(`blacklist:${token}`,'true','Ex',24*60*60)
     }
 
-    res.clearCookie('token', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-    });
+    res.clearCookie('token', getCookieOptions());
 
     return res.status(200).json({message:"Logged out successfully"})
 }

@@ -6,10 +6,10 @@ const productSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    description: [{
+    description:{
         type: String,
         trim: true,
-    }],
+    },
     category: {
       type: String,
       required: true,
@@ -29,8 +29,7 @@ const productSchema = new mongoose.Schema({
 
     seller: {
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      index: true,
+      required: true
     },
     images:[{
         url:String,
