@@ -52,163 +52,12 @@ function getPaymentBadgeClass(status, cssModule) {
   }
 }
 
-function isRevenueReadyOrder(order) {
-  return order?.paymentStatus === 'COMPLETED' || ['CONFIRMED', 'SHIPPED', 'DELIVERED'].includes(order?.status)
-}
-
-function getChartPoints(values = []) {
-  if (!values.length) {
-    return []
-  }
-
-  const max = Math.max(...values, 1)
-  const min = Math.min(...values, 0)
-  const range = max - min || 1
-
-  return values.map((value, index) => {
-    const x = values.length === 1 ? 50 : 8 + (index * 84) / (values.length - 1)
-    const y = 88 - ((value - min) / range) * 64
-
-    return {
-      x: Number(x.toFixed(2)),
-      y: Number(y.toFixed(2)),
-    }
-  })
-}
-
-function getAreaPath(points = []) {
-  if (!points.length) {
-    return ''
-  }
-
-  const firstPoint = points[0]
-  const lastPoint = points[points.length - 1]
-  const linePath = points.map((point) => `${point.x},${point.y}`).join(' ')
-
-  return `M ${firstPoint.x} 92 L ${linePath} L ${lastPoint.x} 92 Z`
-}
-
-function clampLabel(value = '', maxLength = 16) {
-  if (value.length <= maxLength) {
-    return value
-  }
-
-  return `${value.slice(0, Math.max(maxLength - 3, 1))}...`
-}
-
 function getProductDescriptionText(description) {
   return typeof description === 'string' ? description : description || ''
 }
 
 function hasRefreshFailures(results = []) {
   return results.some((result) => result.status === 'rejected')
-}
-
-function buildDailyPerformance(orders = []) {
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-
-  const days = Array.from({ length: 7 }, (_, index) => {
-    const date = new Date(today)
-    date.setDate(today.getDate() - (6 - index))
-
-    return {
-      key: date.toISOString().slice(0, 10),
-      label: new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short' }).format(date),
-      revenue: 0,
-      orders: 0,
-      units: 0,
-    }
-  })
-
-  const dayIndex = days.reduce((result, day, index) => {
-    result[day.key] = index
-    return result
-  }, {})
-
-  orders.forEach((order) => {
-    const createdAt = new Date(order.createdAt)
-
-    if (Number.isNaN(createdAt.getTime())) {
-      return
-    }
-
-    createdAt.setHours(0, 0, 0, 0)
-    const key = createdAt.toISOString().slice(0, 10)
-    const targetIndex = dayIndex[key]
-
-    if (targetIndex === undefined) {
-      return
-    }
-
-    const units = (order.items || []).reduce((sum, item) => sum + Number(item.quantity || 0), 0)
-
-    days[targetIndex].orders += 1
-    days[targetIndex].units += units
-
-    if (isRevenueReadyOrder(order)) {
-      days[targetIndex].revenue += getOrderValue(order)
-    }
-  })
-
-  return days
-}
-
-function TrendChart({ values, stroke, fill, startLabel, endLabel }) {
-  const points = getChartPoints(values)
-  const areaPath = getAreaPath(points)
-
-  if (!points.length) {
-    return null
-  }
-
-  return (
-    <div className={styles.chartFrame}>
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className={styles.chartSvg} aria-hidden="true">
-        <line x1="8" y1="24" x2="92" y2="24" className={styles.chartGridLine} />
-        <line x1="8" y1="56" x2="92" y2="56" className={styles.chartGridLine} />
-        <line x1="8" y1="88" x2="92" y2="88" className={styles.chartGridLine} />
-        <path d={areaPath} fill={fill} />
-        <polyline
-          fill="none"
-          stroke={stroke}
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          points={points.map((point) => `${point.x},${point.y}`).join(' ')}
-        />
-        {points.map((point) => (
-          <circle key={`${point.x}-${point.y}`} cx={point.x} cy={point.y} r="2.5" fill={stroke} />
-        ))}
-      </svg>
-
-      <div className={styles.chartLabels}>
-        <span>{startLabel}</span>
-        <span>{endLabel}</span>
-      </div>
-    </div>
-  )
-}
-
-function StockBarsChart({ items }) {
-  const maxValue = Math.max(...items.map((item) => item.value), 1)
-
-  return (
-    <div className={styles.stockBars}>
-      {items.map((item) => (
-        <div key={item.label} className={styles.stockBarItem}>
-          <div className={styles.stockBarTrack}>
-            <div
-              className={styles.stockBarFill}
-              style={{ height: `${Math.max((item.value / maxValue) * 100, item.value > 0 ? 18 : 0)}%` }}
-            />
-          </div>
-          <strong>{item.value}</strong>
-          <span>{item.label}</span>
-        </div>
-      ))}
-    </div>
-  )
 }
 
 export default function SellerDashboardPage() {
@@ -279,8 +128,6 @@ export default function SellerDashboardPage() {
     }
   }, [sellerProducts])
 
-  const performanceSeries = useMemo(() => buildDailyPerformance(orders), [orders])
-
   const statusSummary = useMemo(() => {
     return SELLER_ORDER_FLOW.map((status) => ({
       status,
@@ -288,25 +135,9 @@ export default function SellerDashboardPage() {
     })).filter((item) => item.count > 0)
   }, [orders])
 
-  const inventorySeries = useMemo(() => {
-    return [...sellerProducts]
-      .sort((left, right) => Number(right.stock || 0) - Number(left.stock || 0))
-      .slice(0, 5)
-      .map((product) => ({
-        label: clampLabel(product.title, 14),
-        value: Number(product.stock || 0),
-      }))
-  }, [sellerProducts])
-
   const recentCatalog = useMemo(() => {
     return (dashboardProducts.length ? dashboardProducts : sellerProducts).slice(0, 4)
   }, [dashboardProducts, sellerProducts])
-
-  const revenueTrend = performanceSeries.map((day) => day.revenue)
-  const orderTrend = performanceSeries.map((day) => day.orders)
-  const unitTrend = performanceSeries.map((day) => day.units)
-  const trendStart = performanceSeries[0]?.label || 'Start'
-  const trendEnd = performanceSeries[performanceSeries.length - 1]?.label || 'Today'
   const isRefreshing = isLoadingMetrics || isLoadingOrders || isLoadingProducts || productLoading
   const dashboardError = error || productError
 
@@ -554,72 +385,6 @@ export default function SellerDashboardPage() {
           <p>Use the live editor below to restock, reprice, or retire listings quickly.</p>
         </article>
       </div>
-
-      <article className={`${styles.panel} ${styles.analyticsPanel}`}>
-        <div className={styles.panelHeader}>
-          <div>
-            <span className={styles.panelLabel}>Live analytics</span>
-            <h2>Real-time seller performance</h2>
-          </div>
-          <span className={styles.panelMeta}>Last 7 days, auto-updating every 30 seconds</span>
-        </div>
-
-        <div className={styles.chartGrid}>
-          <div className={styles.chartCard}>
-            <div className={styles.chartHeading}>
-              <span>Revenue trend</span>
-              <strong>{formatCurrency(metrics.revenue)}</strong>
-            </div>
-            <TrendChart
-              values={revenueTrend}
-              stroke="#2563eb"
-              fill="rgba(37, 99, 235, 0.16)"
-              startLabel={trendStart}
-              endLabel={trendEnd}
-            />
-          </div>
-
-          <div className={styles.chartCard}>
-            <div className={styles.chartHeading}>
-              <span>Order flow</span>
-              <strong>{metrics.totalOrders}</strong>
-            </div>
-            <TrendChart
-              values={orderTrend}
-              stroke="#0f766e"
-              fill="rgba(14, 165, 164, 0.14)"
-              startLabel={trendStart}
-              endLabel={trendEnd}
-            />
-          </div>
-
-          <div className={styles.chartCard}>
-            <div className={styles.chartHeading}>
-              <span>Units sold trend</span>
-              <strong>{metrics.sales}</strong>
-            </div>
-            <TrendChart
-              values={unitTrend}
-              stroke="#7c3aed"
-              fill="rgba(124, 58, 237, 0.14)"
-              startLabel={trendStart}
-              endLabel={trendEnd}
-            />
-          </div>
-
-          <div className={styles.chartCard}>
-            <div className={styles.chartHeading}>
-              <span>Top stock positions</span>
-              <strong>{inventoryMetrics.stock}</strong>
-            </div>
-            {inventorySeries.length ? (
-              <StockBarsChart items={inventorySeries} />
-            ) : (
-              <div className={styles.chartEmpty}>Add products to unlock live stock comparison.</div>
-            )}
-          </div>
-        </div>
-      </article>
 
       <div className={styles.contentGrid}>
         <SellerDashboardRecentOrdersPanel
