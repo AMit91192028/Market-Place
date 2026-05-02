@@ -12,7 +12,7 @@ async function createOrder(req, res) {
     try {
 
         // fetch user cart from cart service
-        const cartResponse = await axios.get(`http://localhost:3002/api/cart`, {
+        const cartResponse = await axios.get(`http://marketplace-alb-875871802.ap-south-1.elb.amazonaws.com/api/cart`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }

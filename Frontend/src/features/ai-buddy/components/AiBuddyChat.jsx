@@ -6,7 +6,49 @@ import { useAuth } from '../../auth/hooks/useAuth'
 import { getCart } from '../../../services/api/cartApi'
 import styles from '../styles/AiBuddyChat.module.css'
 
-const SOCKET_URL = import.meta.env.VITE_AI_BUDDY_URL || 'http://localhost:3005'
+const DEFAULT_SOCKET_SERVER_URL = 'http://localhost:3005'
+const DEFAULT_SOCKET_PATH = '/api/socket/socket.io'
+
+function trimTrailingSlash(value = '') {
+  return String(value).replace(/\/+$/, '')
+}
+
+function resolveSocketConfig(rawUrl) {
+  const configuredUrl = String(rawUrl || '').trim()
+
+  if (!configuredUrl) {
+    return {
+      serverUrl: DEFAULT_SOCKET_SERVER_URL,
+      path: DEFAULT_SOCKET_PATH,
+    }
+  }
+
+  if (configuredUrl.startsWith('/')) {
+    return {
+      serverUrl: window.location.origin,
+      path: `${trimTrailingSlash(configuredUrl)}/socket.io`,
+    }
+  }
+
+  try {
+    const url = new URL(configuredUrl)
+    const basePath = trimTrailingSlash(url.pathname)
+
+    return {
+      serverUrl: `${url.protocol}//${url.host}`,
+      path: `${basePath || '/socket.io'}/socket.io`.replace(/\/socket\.io\/socket\.io$/, '/socket.io'),
+    }
+  } catch {
+    return {
+      serverUrl: configuredUrl,
+      path: DEFAULT_SOCKET_PATH,
+    }
+  }
+}
+
+const { serverUrl: SOCKET_SERVER_URL, path: SOCKET_PATH } = resolveSocketConfig(
+  import.meta.env.VITE_AI_BUDDY_URL
+)
 
 const SUGGESTIONS = [
   'Find wireless headphones under 2000',
@@ -57,7 +99,8 @@ export default function AiBuddyChat() {
 
     setStatus('connecting')
 
-    const socket = io(SOCKET_URL, {
+    const socket = io(SOCKET_SERVER_URL, {
+      path: SOCKET_PATH,
       withCredentials: true,
       transports: ['websocket', 'polling'],
     })

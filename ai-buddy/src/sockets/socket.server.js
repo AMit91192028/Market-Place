@@ -8,6 +8,7 @@ const agent = require('../agent/agent');
 async function initSocketServer(httpServer) {
 
     const io = new Server(httpServer,{
+        path:"/api/socket/socket.io",
         cors: {
             origin: process.env.AI_BUDDY_CLIENT_ORIGIN || 'http://localhost:5173',
             credentials: true
