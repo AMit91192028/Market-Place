@@ -1,8 +1,12 @@
 const express = require("express");
 const { connect, subscribeToQueue } = require("./broker/broker");
 const setListeners = require("./broker/listners");
+const cors = require('cors')
 const app = express();
-
+app.use(cors({
+  origin: ['http://localhost:5173','https://market-place-tawny-eight.vercel.app'],
+  credentials: true
+}));
 connect().then(() => {
     setListeners();
 })

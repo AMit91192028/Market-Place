@@ -1,8 +1,48 @@
 {
   "rewrites": [
     {
-      "source": "/:path*",
-      "destination": "http://marketplace-alb-875871802.ap-south-1.elb.amazonaws.com/:path*"
+      "source": "/api/auth",
+      "destination": "http://marketplace-alb-875871802.ap-south-1.elb.amazonaws.com/api/auth"
+    },
+    {
+      "source": "/api/auth/:path*",
+      "destination": "http://marketplace-alb-875871802.ap-south-1.elb.amazonaws.com/api/auth/:path*"
+    },
+    {
+      "source": "/api/products",
+      "destination": "http://marketplace-alb-875871802.ap-south-1.elb.amazonaws.com/api/products/"
+    },
+    {
+      "source": "/api/products/:path*",
+      "destination": "http://marketplace-alb-875871802.ap-south-1.elb.amazonaws.com/api/products/:path*"
+    },
+    {
+      "source": "/api/cart",
+      "destination": "http://marketplace-alb-875871802.ap-south-1.elb.amazonaws.com/api/cart/"
+    },
+    {
+      "source": "/api/cart/:path*",
+      "destination": "http://marketplace-alb-875871802.ap-south-1.elb.amazonaws.com/api/cart/:path*"
+    },
+    {
+      "source": "/api/orders",
+      "destination": "http://marketplace-alb-875871802.ap-south-1.elb.amazonaws.com/api/orders/"
+    },
+    {
+      "source": "/api/orders/:path*",
+      "destination": "http://marketplace-alb-875871802.ap-south-1.elb.amazonaws.com/api/orders/:path*"
+    },
+    {
+      "source": "/api/payments/:path*",
+      "destination": "http://marketplace-alb-875871802.ap-south-1.elb.amazonaws.com/api/payments/:path*"
+    },
+    {
+      "source": "/api/seller/:path*",
+      "destination": "http://marketplace-alb-875871802.ap-south-1.elb.amazonaws.com/api/seller/:path*"
+    },
+    {
+      "source": "/api/socket/:path*",
+      "destination": "http://marketplace-alb-875871802.ap-south-1.elb.amazonaws.com/api/socket/:path*"
     },
     {
       "source": "/(.*)",

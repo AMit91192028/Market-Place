@@ -5,7 +5,7 @@
  
  const app = express();
 app.use(cors({
-  origin: ['http://localhost:5173','https://market-place-git-main-amit91192028s-projects.vercel.app'],
+  origin: ['http://localhost:5173','https://market-place-tawny-eight.vercel.app'],
   credentials: true
 }));
 
