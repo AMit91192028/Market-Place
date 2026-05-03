@@ -62,6 +62,17 @@ export function getProductImage(product) {
   )
 }
 
+export function getProductGalleryImages(product) {
+  const images = Array.isArray(product?.images)
+    ? product.images
+        .map((image) => image?.url || image?.thumbnail || '')
+        .filter(Boolean)
+        .slice(0, 5)
+    : []
+
+  return images.length > 0 ? images : [getProductImage(product)]
+}
+
 export function getProductDescription(description) {
   return String(description || '')
 }

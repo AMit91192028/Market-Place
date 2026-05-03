@@ -6,6 +6,8 @@ import AiBuddyChat from './features/ai-buddy/components/AiBuddyChat'
 import { useAuth, useInitializeAuth } from './features/auth/hooks/useAuth'
 import LoginPage from './features/auth/pages/LoginPage'
 import RegisterPage from './features/auth/pages/RegisterPage'
+import SellerAccessPage from './features/auth/pages/SellerAccessPage'
+import SellerRegisterPage from './features/auth/pages/SellerRegisterPage'
 import CartPage from './features/cart/pages/CartPage'
 import CheckoutPage from './features/order/pages/CheckoutPage'
 import MyOrdersPage from './features/order/pages/MyOrdersPage'
@@ -15,6 +17,7 @@ import ProductListingPage from './features/product/pages/ProductListingPage'
 import StorefrontHomePage from './features/product/pages/StorefrontHomePage'
 import SellerCreateProductPage from './features/seller/pages/SellerCreateProductPage'
 import SellerDashboardPage from './features/seller/pages/SellerDashboardPage'
+import SellerEditProductPage from './features/seller/pages/SellerEditProductPage'
 import './lib/local-toastify/styles.css'
 import './styles/index.css'
 
@@ -60,6 +63,20 @@ function GuestOnlyRoute({ children }) {
   return isAuthenticated ? <Navigate to="/products" replace /> : children
 }
 
+function SellerOnboardingRoute({ children }) {
+  const { authChecked, isAuthenticated, role } = useAuth()
+
+  if (!authChecked) {
+    return <div className="pageState">Preparing seller access...</div>
+  }
+
+  if (isAuthenticated && role === 'seller') {
+    return <Navigate to="/seller/products" replace />
+  }
+
+  return children
+}
+
 export default function App() {
   useInitializeAuth()
 
@@ -84,6 +101,22 @@ export default function App() {
               <GuestOnlyRoute>
                 <RegisterPage />
               </GuestOnlyRoute>
+            }
+          />
+          <Route
+            path="/seller/access"
+            element={
+              <SellerOnboardingRoute>
+                <SellerAccessPage />
+              </SellerOnboardingRoute>
+            }
+          />
+          <Route
+            path="/seller/auth/register"
+            element={
+              <SellerOnboardingRoute>
+                <SellerRegisterPage />
+              </SellerOnboardingRoute>
             }
           />
           <Route
@@ -131,6 +164,14 @@ export default function App() {
             element={
               <ProtectedRoute roles={['seller']}>
                 <SellerCreateProductPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/seller/products/:productId/edit"
+            element={
+              <ProtectedRoute roles={['seller']}>
+                <SellerEditProductPage />
               </ProtectedRoute>
             }
           />

@@ -4,11 +4,21 @@ const jwt = require("jsonwebtoken")
 const redis = require("../db/redis")
 const{publishToQueue} = require("../broker/broker")
 
-function getCookieOptions() {
+function isSecureRequest(req) {
+    return (
+        req.secure ||
+        req.headers['x-forwarded-proto'] === 'https'
+    );
+}
+
+function getCookieOptions(req) {
+    const secure = isSecureRequest(req);
+
     return {
         httpOnly: true,
-        secure: true,
-        sameSite: 'none',
+        secure:false,
+        sameSite: 'lax',
+        path: '/',
         maxAge: 24 * 60 * 60 * 1000,
     };
 }
@@ -56,7 +66,7 @@ async function registerUser(req,res){
         role:user.role
  },process.env.JWT_SECRET,{expiresIn:'1d'})
 
-    res.cookie('token', token, getCookieOptions())
+    res.cookie('token', token, getCookieOptions(req))
 
     res.status(201).json({message:"User registered successfully",
         token,
@@ -96,7 +106,7 @@ async function loginUser(req, res) {
             { expiresIn: '1d' }
         );
 
-        res.cookie('token', token, getCookieOptions());
+        res.cookie('token', token, getCookieOptions(req));
 
         res.status(200).json({
             message: 'Logged in successfully',
@@ -216,7 +226,7 @@ async function logoutUser(req,res){
         await redis.set(`blacklist:${token}`,'true','Ex',24*60*60)
     }
 
-    res.clearCookie('token', getCookieOptions());
+    res.clearCookie('token', getCookieOptions(req));
 
     return res.status(200).json({message:"Logged out successfully"})
 }

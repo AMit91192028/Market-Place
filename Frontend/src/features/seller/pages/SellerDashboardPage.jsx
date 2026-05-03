@@ -1,11 +1,10 @@
-import { useEffect, useEffectEvent, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 import {
   deleteProduct,
   getSellerProducts,
-  updateProduct,
 } from '../../../services/api/productApi'
 import {
   getSellerDashboardProducts,
@@ -20,8 +19,6 @@ import {
   getOrderValue,
   getProductImage,
   getUserDisplayName,
-  normalizeProductDescriptionInput,
-  toProductDescriptionTextarea,
 } from '../../../utils/marketplace'
 import SellerDashboardInventoryPanel from '../components/SellerDashboardInventoryPanel'
 import SellerDashboardOrdersPanel from '../components/SellerDashboardOrdersPanel'
@@ -40,14 +37,6 @@ function getPaymentBadgeClass(status, cssModule) {
     default:
       return cssModule.neutralBadge
   }
-}
-
-function hasRefreshFailures(results = []) {
-  return results.some((result) => result.status === 'rejected')
-}
-
-function getProductDescriptionText(description) {
-  return toProductDescriptionTextarea(description)
 }
 
 function mergeProductsById(primaryProducts = [], secondaryProducts = []) {
@@ -72,10 +61,8 @@ function mergeProductsById(primaryProducts = [], secondaryProducts = []) {
 
 export default function SellerDashboardPage() {
   const dispatch = useDispatch()
-  const [drafts, setDrafts] = useState({})
   const [message, setMessage] = useState('')
   const [lastUpdatedAt, setLastUpdatedAt] = useState(null)
-  const [savingProductId, setSavingProductId] = useState('')
   const [deletingProductId, setDeletingProductId] = useState('')
   const [localActionError, setLocalActionError] = useState('')
 
@@ -91,38 +78,26 @@ export default function SellerDashboardPage() {
     error: sellerDashboardError,
   } = useSelector((state) => state.sellerDashboard)
 
-  const refreshSellerReadModels = useEffectEvent(async () => {
-    const results = await Promise.allSettled([
-      dispatch(getSellerMetrics()).unwrap(),
-      dispatch(getSellerOrders()).unwrap(),
-      dispatch(getSellerDashboardProducts()).unwrap(),
-    ])
-
-    setLastUpdatedAt(new Date().toISOString())
-    return results
-  })
-
-  const refreshDashboard = useEffectEvent(async () => {
-    const results = await Promise.allSettled([
-      dispatch(getSellerMetrics()).unwrap(),
-      dispatch(getSellerOrders()).unwrap(),
-      dispatch(getSellerDashboardProducts()).unwrap(),
-      dispatch(getSellerProducts()).unwrap(),
-    ])
-
-    setLastUpdatedAt(new Date().toISOString())
-    return results
-  })
-
   useEffect(() => {
-    void refreshDashboard()
+    async function runDashboardRefresh() {
+      await Promise.allSettled([
+        dispatch(getSellerMetrics()).unwrap(),
+        dispatch(getSellerOrders()).unwrap(),
+        dispatch(getSellerDashboardProducts()).unwrap(),
+        dispatch(getSellerProducts()).unwrap(),
+      ])
+
+      setLastUpdatedAt(new Date().toISOString())
+    }
+
+    void runDashboardRefresh()
 
     const intervalId = window.setInterval(() => {
-      void refreshDashboard()
+      void runDashboardRefresh()
     }, LIVE_REFRESH_MS)
 
     return () => window.clearInterval(intervalId)
-  }, [refreshDashboard])
+  }, [dispatch])
 
   const productNameById = useMemo(() => {
     return [...mirroredProducts, ...sellerProducts].reduce((result, product) => {
@@ -170,59 +145,28 @@ export default function SellerDashboardPage() {
   const isRefreshing = isLoadingMetrics || isLoadingOrders || isLoadingProducts || productLoading
   const dashboardError = localActionError || sellerDashboardError || productError
 
-  function updateDraft(productId, field, value) {
-    setDrafts((current) => ({
-      ...current,
-      [productId]: {
-        ...current[productId],
-        [field]: value,
-      },
-    }))
-  }
+  async function refreshSellerReadModels() {
+    await Promise.allSettled([
+      dispatch(getSellerMetrics()).unwrap(),
+      dispatch(getSellerOrders()).unwrap(),
+      dispatch(getSellerDashboardProducts()).unwrap(),
+      dispatch(getSellerProducts()).unwrap(),
+    ])
 
-  async function handleSave(productId) {
-    const sourceProduct = sellerProducts.find((product) => product._id === productId)
-    const draft = drafts[productId] || {
-      title: sourceProduct?.title || '',
-      category: sourceProduct?.category || '',
-      description: getProductDescriptionText(sourceProduct?.description),
-      priceAmount: sourceProduct?.price?.amount || 0,
-      stock: sourceProduct?.stock || 0,
-    }
-
-    setSavingProductId(productId)
-    setLocalActionError('')
-    setMessage('')
-
-    try {
-      await dispatch(
-        updateProduct({
-          productId,
-          data: {
-            title: String(draft.title || '').trim(),
-            category: String(draft.category || '').trim(),
-            description: normalizeProductDescriptionInput(draft.description),
-            stock: Number(draft.stock || 0),
-            price: {
-              amount: Number(draft.priceAmount || 0),
-              currency: sourceProduct?.price?.currency || 'INR',
-            },
-          },
-        })
-      ).unwrap()
-
-      toast.success('Product updated successfully.')
-      setMessage('Product updated successfully.')
-      void refreshSellerReadModels()
-    } catch (error) {
-      toast.error(error || 'Unable to update product.')
-      setLocalActionError(error || 'Unable to update product.')
-    } finally {
-      setSavingProductId('')
-    }
+    setLastUpdatedAt(new Date().toISOString())
   }
 
   async function handleDelete(productId) {
+    const productToDelete = sellerProducts.find((product) => product._id === productId)
+    const shouldDelete =
+      typeof window === 'undefined'
+        ? true
+        : window.confirm(`Delete "${productToDelete?.title || 'this product'}" from the product service?`)
+
+    if (!shouldDelete) {
+      return
+    }
+
     setDeletingProductId(productId)
     setLocalActionError('')
     setMessage('')
@@ -231,7 +175,7 @@ export default function SellerDashboardPage() {
       await dispatch(deleteProduct(productId)).unwrap()
       toast.success('Product deleted successfully.')
       setMessage('Product deleted successfully.')
-      void refreshSellerReadModels()
+      await refreshSellerReadModels()
     } catch (error) {
       toast.error(error || 'Unable to delete product.')
       setLocalActionError(error || 'Unable to delete product.')
@@ -424,14 +368,9 @@ export default function SellerDashboardPage() {
       <SellerDashboardInventoryPanel
         styles={styles}
         sellerProducts={sellerProducts}
-        drafts={drafts}
         productLoading={productLoading}
-        savingProductId={savingProductId}
         deletingProductId={deletingProductId}
-        updateDraft={updateDraft}
-        handleSave={handleSave}
         handleDelete={handleDelete}
-        getProductDescriptionText={getProductDescriptionText}
         formatCurrency={formatCurrency}
         formatProductCategory={formatProductCategory}
       />

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
-const defaultValues = {
+const DEFAULT_VALUES = {
   title: '',
   category: '',
   description: '',
@@ -16,22 +16,38 @@ export default function SellerDashboardCreateProductPanel({
   onSubmit,
   isPublishing,
   onCancel,
+  initialValues = DEFAULT_VALUES,
+  submitLabel = 'Publish product',
+  eyebrow = 'New Listing',
+  heading = 'Create product in product service',
+  metaText = 'Images are uploaded as multipart form data.',
+  showImages = true,
 }) {
   const {
     register,
     handleSubmit,
+    reset,
     watch,
     formState: { errors },
-  } = useForm({ defaultValues })
+  } = useForm({ defaultValues: initialValues })
 
   const selectedImages = watch('images')
   const [previewUrls, setPreviewUrls] = useState([])
+
+  useEffect(() => {
+    reset(initialValues)
+  }, [initialValues, reset])
 
   const selectedImageNames = useMemo(() => {
     return Array.from(selectedImages || []).map((file) => file.name)
   }, [selectedImages])
 
   useEffect(() => {
+    if (!showImages) {
+      setPreviewUrls([])
+      return undefined
+    }
+
     const files = Array.from(selectedImages || [])
     const nextPreviewUrls = files.map((file) => ({
       name: file.name,
@@ -45,16 +61,16 @@ export default function SellerDashboardCreateProductPanel({
         URL.revokeObjectURL(preview.url)
       })
     }
-  }, [selectedImages])
+  }, [selectedImages, showImages])
 
   return (
     <article className={styles.panel}>
       <div className={styles.panelHeader}>
         <div>
-          <span className={styles.panelEyebrow}>New Listing</span>
-          <h2>Create product in product service</h2>
+          <span className={styles.panelEyebrow}>{eyebrow}</span>
+          <h2>{heading}</h2>
         </div>
-        <span className={styles.panelMeta}>Images are uploaded as multipart form data.</span>
+        <span className={styles.panelMeta}>{metaText}</span>
       </div>
 
       <form className={styles.createForm} onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
@@ -137,17 +153,19 @@ export default function SellerDashboardCreateProductPanel({
           </label>
         </div>
 
-        <label className={styles.fieldBlock}>
-          <span>Images</span>
-          <input type="file" accept="image/*" multiple {...register('images')} />
-          <small>
-            {selectedImageNames.length
-              ? `${selectedImageNames.length} file${selectedImageNames.length === 1 ? '' : 's'} selected: ${selectedImageNames.join(', ')}`
-              : 'Optional. Add up to 5 product images.'}
-          </small>
-        </label>
+        {showImages ? (
+          <label className={styles.fieldBlock}>
+            <span>Images</span>
+            <input type="file" accept="image/*" multiple {...register('images')} />
+            <small>
+              {selectedImageNames.length
+                ? `${selectedImageNames.length} file${selectedImageNames.length === 1 ? '' : 's'} selected: ${selectedImageNames.join(', ')}`
+                : 'Optional. Add up to 5 product images.'}
+            </small>
+          </label>
+        ) : null}
 
-        {previewUrls.length ? (
+        {showImages && previewUrls.length ? (
           <div className={styles.previewGrid}>
             {previewUrls.map((preview) => (
               <figure key={preview.url} className={styles.previewCard}>
@@ -160,7 +178,7 @@ export default function SellerDashboardCreateProductPanel({
 
         <div className={styles.cardActions}>
           <button type="submit" className={styles.primaryButton} disabled={isPublishing}>
-            {isPublishing ? 'Publishing...' : 'Publish product'}
+            {isPublishing ? 'Saving...' : submitLabel}
           </button>
           <button type="button" className={styles.secondaryButton} onClick={onCancel}>
             Cancel

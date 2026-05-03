@@ -11,7 +11,6 @@ import {
   getBadgeText,
   getCategoryMonogram,
   getProductDiscountPercent,
-  getProductDescription,
   getProductImage,
   getProductOriginalPrice,
   getProductRating,
@@ -149,25 +148,6 @@ export default function StorefrontHomePage() {
   return (
     <section className={styles.page}>
       <div className={styles.heroShell}>
-        <aside className={styles.categoryRail}>
-          <div className={styles.railTitle}>
-            <span className={styles.kicker}>Shopping by collection</span>
-            <h2>Browse by department</h2>
-          </div>
-
-          <div className={styles.railList}>
-            {categoryCollections.map((category) => (
-              <Link key={category} to={getCategoryHref(category)} className={styles.railItem}>
-                <span className={styles.railBadge}>{getCategoryMonogram(category)}</span>
-                <div>
-                  <strong>{category}</strong>
-                  <span>Curated picks and trending deals</span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </aside>
-
         <div className={styles.heroStage}>
           <div className={styles.heroCopy}>
             <span className={styles.heroEyebrow}>Summer sale spotlight</span>
@@ -185,21 +165,6 @@ export default function StorefrontHomePage() {
                 Explore deals
               </Link>
             </div>
-
-            <div className={styles.heroFacts}>
-              <div>
-                <strong>{products.length}</strong>
-                <span>Live listings in focus</span>
-              </div>
-              <div>
-                <strong>Secure</strong>
-                <span>Cart, checkout, and orders connected</span>
-              </div>
-              <div>
-                <strong>Curated</strong>
-                <span>Collection-first browsing experience</span>
-              </div>
-            </div>
           </div>
 
           <div className={styles.heroFeature}>
@@ -215,10 +180,8 @@ export default function StorefrontHomePage() {
               <span className={styles.inlinePill}>Featured item</span>
               <h3>{heroProduct?.title || 'Fresh arrivals for every aisle'}</h3>
               <p>
-                {heroProduct
-                  ? getProductDescription(heroProduct.description) ||
-                    'Explore a polished product presentation backed by your live microservices.'
-                  : 'Browse a storefront experience inspired by premium retail themes and adapted for your marketplace.'}
+                Browse a polished product spotlight tied directly to your live marketplace catalog
+                and real pricing data.
               </p>
               <div className={styles.heroPriceRow}>
                 <strong>
@@ -275,31 +238,27 @@ export default function StorefrontHomePage() {
                 <div className={styles.productMedia}>
                   <img src={getProductImage(product)} alt={product.title} />
                   <span className={styles.productBadge}>{getBadgeText(product)}</span>
+                  <span className={styles.ratingBadge}>{getProductRating(product)}★</span>
                 </div>
 
                 <div className={styles.productBody}>
                   <span className={styles.inlinePill}>{formatProductCategory(product.category)}</span>
                   <h3>{product.title}</h3>
-                  <p>
-                    {getProductDescription(product.description) ||
-                      'A polished marketplace pick ready for fast checkout.'}
-                  </p>
                   <div className={styles.priceLine}>
-                    <strong>{formatCurrency(product.price?.amount, product.price?.currency || 'INR')}</strong>
-                    <span>
-                      {getProductDiscountPercent(product) > 0
-                        ? `${getProductDiscountPercent(product)}% off`
-                        : 'Marketplace value'}
-                    </span>
-                  </div>
-                  <div className={styles.marketMeta}>
-                    <span className={styles.ratingPill}>⭐ {getProductRating(product)}</span>
+                    <strong className={styles.priceValue}>
+                      {formatCurrency(product.price?.amount, product.price?.currency || 'INR')}
+                    </strong>
                     {getProductDiscountPercent(product) > 0 ? (
                       <span className={styles.originalPrice}>
                         {formatCurrency(getProductOriginalPrice(product), product.price?.currency || 'INR')}
                       </span>
                     ) : null}
                   </div>
+                  <p className={styles.offerText}>
+                    {getProductDiscountPercent(product) > 0
+                      ? `${getProductDiscountPercent(product)}% off`
+                      : 'Marketplace value'}
+                  </p>
                   <p className={styles.deliveryText}>{getDeliveryLabel(product)}</p>
                   <div className={styles.cardActions}>
                     <Link to={`/products/${product._id}`} className={styles.ghostButton}>
@@ -372,27 +331,41 @@ export default function StorefrontHomePage() {
               <article key={product._id} className={styles.productCard}>
                 <div className={styles.productMedia}>
                   <img src={getProductImage(product)} alt={product.title} />
+                  <span className={styles.productBadge}>{getBadgeText(product)}</span>
+                  <span className={styles.ratingBadge}>{getProductRating(product)}★</span>
                 </div>
 
                 <div className={styles.productBody}>
                   <span className={styles.inlinePill}>{formatProductCategory(product.category)}</span>
                   <h3>{product.title}</h3>
                   <div className={styles.priceLine}>
-                    <strong>{formatCurrency(product.price?.amount, product.price?.currency || 'INR')}</strong>
-                    <span>{getProductDiscountPercent(product) > 0 ? `${getProductDiscountPercent(product)}% off` : getBadgeText(product)}</span>
-                  </div>
-                  <div className={styles.marketMeta}>
-                    <span className={styles.ratingPill}>⭐ {getProductRating(product)}</span>
+                    <strong className={styles.priceValue}>
+                      {formatCurrency(product.price?.amount, product.price?.currency || 'INR')}
+                    </strong>
                     {getProductDiscountPercent(product) > 0 ? (
                       <span className={styles.originalPrice}>
                         {formatCurrency(getProductOriginalPrice(product), product.price?.currency || 'INR')}
                       </span>
                     ) : null}
                   </div>
+                  <p className={styles.offerText}>
+                    {getProductDiscountPercent(product) > 0
+                      ? `${getProductDiscountPercent(product)}% off`
+                      : getBadgeText(product)}
+                  </p>
                   <p className={styles.deliveryText}>{getDeliveryLabel(product)}</p>
-                  <Link to={`/products/${product._id}`} className={styles.textLink}>
-                    Open product page
-                  </Link>
+                  <div className={styles.cardActions}>
+                    <Link to={`/products/${product._id}`} className={styles.ghostButton}>
+                      Details
+                    </Link>
+                    <button
+                      className={styles.primaryButton}
+                      disabled={product.stock <= 0}
+                      onClick={() => handleAddToCart(product._id)}
+                    >
+                      Add to cart
+                    </button>
+                  </div>
                 </div>
               </article>
             ))}

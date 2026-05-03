@@ -5,7 +5,7 @@ import { toast } from 'react-toastify'
 import { registerUser } from '../../../services/api/authApi'
 import styles from '../styles/Auth.module.css'
 
-export default function RegisterPage() {
+export default function SellerRegisterPage() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const { isLoading, error } = useSelector((state) => state.auth)
@@ -27,14 +27,14 @@ export default function RegisterPage() {
             firstName: values.firstName,
             lastName: values.lastName,
           },
-          role: 'user',
+          role: 'seller',
         })
       ).unwrap()
 
-      toast.success(`Account created${user?.username ? ` for ${user.username}` : ''}.`)
-      navigate('/products')
+      toast.success(`Seller account created${user?.username ? ` for ${user.username}` : ''}.`)
+      navigate('/seller/products/new')
     } catch (submitError) {
-      toast.error(submitError || 'Unable to create account.')
+      toast.error(submitError || 'Unable to create seller account.')
       return null
     }
   }
@@ -43,19 +43,19 @@ export default function RegisterPage() {
     <section className={styles.authLayout}>
       <div className={styles.brandPanel}>
         <div className={styles.brandContent}>
-          <span className={styles.eyebrow}>Join marketplace</span>
+          <span className={styles.eyebrow}>Seller signup</span>
           <div className={styles.brandMark}>MP</div>
           <div className={styles.brandTitle}>Market Place</div>
-          <p className={styles.brandSubline}>Create your account for shopping and selling.</p>
+          <p className={styles.brandSubline}>Create your seller account and start listing products.</p>
         </div>
       </div>
 
       <div className={styles.formCard}>
         <div className={`${styles.formCardInner} ${styles.formCardInnerWide}`}>
           <div className={styles.formHeader}>
-            <span className={styles.badge}>Create account</span>
-            <h2>Sign up</h2>
-            <p>Set up your details once and start browsing or listing products immediately.</p>
+            <span className={styles.badge}>Seller account</span>
+            <h2>Seller sign up</h2>
+            <p>Create your seller credentials and launch your marketplace storefront.</p>
           </div>
 
           {error ? <div className={styles.errorBox}>{error}</div> : null}
@@ -126,24 +126,13 @@ export default function RegisterPage() {
               </label>
             </div>
 
-            <div className={styles.field}>
-              <span>Account type</span>
-              <div className={styles.userDefaultNotice}>
-                <strong>Customer account</strong>
-                <small>
-                  This signup creates a shopping account by default. Seller accounts use the
-                  separate seller flow.
-                </small>
-              </div>
-            </div>
-
             <button type="submit" className={styles.primaryButton} disabled={isLoading}>
-              {isLoading ? 'Creating account...' : 'Create account'}
+              {isLoading ? 'Creating seller account...' : 'Create seller account'}
             </button>
           </form>
 
           <p className={styles.footerCopy}>
-            Already have an account? <Link to="/auth/login">Sign in</Link>
+            Already have an account? <Link to="/auth/login">Login</Link>
           </p>
         </div>
       </div>

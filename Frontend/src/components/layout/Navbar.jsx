@@ -34,6 +34,7 @@ export default function Navbar() {
   const { itemCount } = useSelector((state) => state.cart)
   const [menuOpen, setMenuOpen] = useState(false)
   const [accountOpen, setAccountOpen] = useState(false)
+  const [moreOpen, setMoreOpen] = useState(false)
   const [locationOpen, setLocationOpen] = useState(false)
   const [locationMessage, setLocationMessage] = useState('')
   const [addressForm, setAddressForm] = useState(EMPTY_ADDRESS)
@@ -53,6 +54,14 @@ export default function Navbar() {
     () => addresses.find((address) => address._id === selectedAddressId) || addresses[0] || null,
     [addresses, selectedAddressId]
   )
+  const mobileAccountHref = isAuthenticated
+    ? role === 'seller'
+      ? '/seller/products'
+      : '/orders'
+    : '/auth/login'
+  const mobileAccountLabel = isAuthenticated ? (role === 'seller' ? 'Studio' : 'Account') : 'Login'
+  const mobilePrimaryHref = role === 'seller' ? '/seller/products' : role === 'user' ? '/cart' : '/auth/login'
+  const mobilePrimaryLabel = role === 'seller' ? 'Studio' : 'Cart'
 
   useEffect(() => {
     if (isAuthenticated && role === 'user') {
@@ -67,12 +76,6 @@ export default function Navbar() {
   }, [dispatch, isAuthenticated])
 
   useEffect(() => {
-    if (!selectedAddressId && addresses[0]?._id) {
-      setSelectedAddressId(addresses[0]._id)
-    }
-  }, [addresses, selectedAddressId])
-
-  useEffect(() => {
     if (typeof window !== 'undefined' && selectedAddress?._id) {
       window.localStorage.setItem(LOCATION_STORAGE_KEY, selectedAddress._id)
     }
@@ -83,6 +86,7 @@ export default function Navbar() {
     navigate('/products')
     setMenuOpen(false)
     setAccountOpen(false)
+    setMoreOpen(false)
     setLocationOpen(false)
   }
 
@@ -97,6 +101,13 @@ export default function Navbar() {
 
     navigate(`/products${params.toString() ? `?${params.toString()}` : ''}`)
     setMenuOpen(false)
+  }
+
+  function handleSellerAccessClick() {
+    setAccountOpen(false)
+    setMoreOpen(false)
+    setMenuOpen(false)
+    navigate('/seller/access')
   }
 
   function handleLocationToggle() {
@@ -253,6 +264,7 @@ export default function Navbar() {
                 className={styles.accountButton}
                 onClick={() => {
                   setLocationOpen(false)
+                  setMoreOpen(false)
                   setAccountOpen((value) => !value)
                 }}
               >
@@ -301,6 +313,31 @@ export default function Navbar() {
                 </div>
               ) : null}
             </div>
+
+            {!isAuthenticated || role !== 'seller' ? (
+              <div className={styles.moreWrap}>
+                <button
+                  type="button"
+                  className={styles.accountButton}
+                  onClick={() => {
+                    setAccountOpen(false)
+                    setLocationOpen(false)
+                    setMoreOpen((value) => !value)
+                  }}
+                >
+                  More
+                </button>
+
+                {moreOpen ? (
+                  <div className={styles.moreMenu}>
+                    <span className={styles.accountTitle}>More</span>
+                    <button type="button" className={styles.accountLink} onClick={handleSellerAccessClick}>
+                      Become a Seller
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
 
             {role === 'user' ? (
               <Link to="/cart" className={styles.actionLink} onClick={() => setAccountOpen(false)}>
@@ -386,6 +423,11 @@ export default function Navbar() {
               </Link>
             </div>
           ) : null}
+          {!isAuthenticated || role !== 'seller' ? (
+            <button type="button" className={styles.mobileSecondary} onClick={handleSellerAccessClick}>
+              Become a Seller
+            </button>
+          ) : null}
           {isAuthenticated ? (
             <button type="button" className={styles.mobileLogout} onClick={handleLogout}>
               Logout
@@ -396,6 +438,53 @@ export default function Navbar() {
           </button>
         </div>
       </div>
+
+      <nav className={styles.mobileBottomNav} aria-label="Mobile quick navigation">
+        <NavLink to="/" className={({ isActive }) => `${styles.mobileBottomLink} ${isActive ? styles.mobileBottomLinkActive : ''}`}>
+          <span>Home</span>
+        </NavLink>
+        <NavLink
+          to="/products"
+          className={({ isActive }) => `${styles.mobileBottomLink} ${isActive ? styles.mobileBottomLinkActive : ''}`}
+        >
+          <span>Categories</span>
+        </NavLink>
+        <NavLink
+          to={mobileAccountHref}
+          className={({ isActive }) => `${styles.mobileBottomLink} ${isActive ? styles.mobileBottomLinkActive : ''}`}
+          onClick={() => {
+            setMenuOpen(false)
+            setAccountOpen(false)
+            setMoreOpen(false)
+          }}
+        >
+          <span>{mobileAccountLabel}</span>
+        </NavLink>
+        <NavLink
+          to={mobilePrimaryHref}
+          className={({ isActive }) => `${styles.mobileBottomLink} ${isActive ? styles.mobileBottomLinkActive : ''}`}
+          onClick={() => {
+            setMenuOpen(false)
+            setAccountOpen(false)
+            setMoreOpen(false)
+          }}
+        >
+          <span>{mobilePrimaryLabel}</span>
+          {role === 'user' && itemCount > 0 ? <span className={styles.mobileBottomBadge}>{itemCount}</span> : null}
+        </NavLink>
+        <button
+          type="button"
+          className={`${styles.mobileBottomLink} ${menuOpen ? styles.mobileBottomLinkActive : ''}`}
+          onClick={() => {
+            setAccountOpen(false)
+            setLocationOpen(false)
+            setMoreOpen(false)
+            setMenuOpen((value) => !value)
+          }}
+        >
+          <span>More</span>
+        </button>
+      </nav>
     </header>
   )
 }

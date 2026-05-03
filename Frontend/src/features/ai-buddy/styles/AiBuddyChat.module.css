@@ -1,7 +1,7 @@
 .root {
   position: fixed;
   right: 0.75rem;
-  bottom: 0.75rem;
+  bottom: 5.55rem;
   z-index: 60;
   display: flex;
   align-items: flex-end;
@@ -279,7 +279,7 @@
 @media (min-width: 640px) {
   .root {
     right: 1rem;
-    bottom: 1rem;
+    bottom: 5.8rem;
   }
 
   .panel {

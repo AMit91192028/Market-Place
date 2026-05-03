@@ -174,25 +174,6 @@ export default function ProductListingPage() {
         </aside>
 
         <div className={styles.resultsPane}>
-          <div className={styles.resultsHeader}>
-            <div>
-              <span className={styles.eyebrow}>Catalog results</span>
-              <h2>
-                {category
-                  ? `${productMeta.total} result${productMeta.total === 1 ? '' : 's'} in ${category}`
-                  : `${productMeta.total} products ready to browse`}
-              </h2>
-              <p>
-                {query
-                  ? `Search applied for "${query}". Adjust filters to widen the selection.`
-                  : 'Browse a denser marketplace-style layout with product-first hierarchy.'}
-              </p>
-            </div>
-            <Link to="/" className={styles.textLink}>
-              Back to homepage
-            </Link>
-          </div>
-
           <div className={styles.activeFilterRow}>
             {category ? <span className={styles.filterPill}>{category}</span> : null}
             {minprice ? <span className={styles.filterPill}>Min {formatCurrency(minprice)}</span> : null}

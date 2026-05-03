@@ -107,7 +107,7 @@ await dispatch(loginUser(credentials)).unwrap()
 - Uses `useAuth()` hook to access user state
 - `useInitializeAuth()` restores session on app load
 - httpOnly cookies for refresh tokens (backend's responsibility)
-- Access token stored in localStorage
+- Access token stored in sessionStorage during the active browser session
 
 ## 🚢 Build & Deploy
 

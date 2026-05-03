@@ -8,9 +8,9 @@ const agent = require('../agent/agent');
 async function initSocketServer(httpServer) {
 
     const io = new Server(httpServer,{
-        path:"/api/socket/socket.io",
+        path:"/api/socket/socket.io/",
         cors: {
-            origin: process.env.AI_BUDDY_CLIENT_ORIGIN || 'http://localhost:5173',
+            origin:[ 'http://localhost:5173','https://market-place-tawny-eight.vercel.app'],
             credentials: true
         }
     })
@@ -18,8 +18,10 @@ async function initSocketServer(httpServer) {
     io.use((socket, next) => {
 
         const cookies = socket.handshake.headers?.cookie;
-
-        const { token } = cookies ? cookie.parse(cookies) : {};
+        const parsedCookies = cookies ? cookie.parse(cookies) : {};
+        const headerToken = socket.handshake.headers?.authorization?.split(' ')[1];
+        const authToken = socket.handshake.auth?.token;
+        const token = parsedCookies.token || authToken || headerToken;
 
         if (!token) {
             return next(new Error('Token not provided'));
@@ -45,24 +47,35 @@ async function initSocketServer(httpServer) {
 
 
         socket.on('message', async (data) => {
-
-            const agentResponse = await agent.invoke({
-                messages: [
-                    {
-                        role: "user",
-                        content: data
+            try {
+                const agentResponse = await agent.invoke({
+                    messages: [
+                        {
+                            role: "user",
+                            content: data
+                        }
+                    ]
+                }, {
+                    metadata: {
+                        token: socket.token
                     }
-                ]
-            }, {
-                metadata: {
-                    token: socket.token
-                }
-            })
+                })
 
-            const lastMessage = agentResponse.messages[ agentResponse.messages.length - 1 ]
+                const lastMessage = agentResponse.messages[ agentResponse.messages.length - 1 ]
+                socket.emit('message', lastMessage.content)
+            } catch (error) {
+                console.error('AI Buddy socket message error:', error)
+                socket.emit('message', error?.message || 'AI Buddy is temporarily unavailable.')
+            }
 
-            socket.emit('message', lastMessage.content)
+        })
 
+        socket.on('error', (error) => {
+            console.error('AI Buddy socket error:', error)
+        })
+
+        socket.on('disconnect', (reason) => {
+            console.log('AI Buddy socket disconnected:', reason)
         })
 
     })

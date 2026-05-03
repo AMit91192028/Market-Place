@@ -333,6 +333,357 @@
   font-weight: 700;
 }
 
+.productShowcase,
+.detailInfoCard {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 24px;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+}
+
+.productShowcase {
+  display: grid;
+  gap: 1.25rem;
+  padding: 1rem;
+}
+
+.galleryPanel,
+.purchasePanel,
+.titleBlock,
+.priceCluster,
+.highlightPanel,
+.mobileSelectionCard,
+.detailInfoCard,
+.infoContent,
+.infoSection {
+  display: grid;
+  gap: 1rem;
+}
+
+.previewWrap {
+  position: relative;
+  min-height: 320px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at top, rgba(37, 99, 235, 0.12), transparent 34%),
+    linear-gradient(180deg, #ffffff, #f8fafc);
+  padding: 1rem;
+}
+
+.previewWrap img {
+  width: 100%;
+  max-width: 520px;
+  max-height: 420px;
+  object-fit: contain;
+}
+
+.thumbnailRail {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(64px, 1fr));
+  gap: 0.75rem;
+}
+
+.thumbnailButton {
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 16px;
+  background: #ffffff;
+  padding: 0.45rem;
+  min-height: 74px;
+}
+
+.thumbnailButton img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.thumbnailButtonActive {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.galleryActions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+.mobileSelectionCard {
+  display: none;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+  padding: 1rem;
+  border-radius: 22px;
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.mobileSelectionCard span,
+.mobileSelectionCard small,
+.mobileSelectionPrice span {
+  color: #64748b;
+}
+
+.mobileSelectionCard strong,
+.mobileSelectionPrice strong {
+  display: block;
+  color: #0f172a;
+}
+
+.mobileSelectionCard small {
+  display: block;
+  margin-top: 0.15rem;
+}
+
+.mobileSelectionPrice {
+  text-align: right;
+}
+
+.buyNowButton {
+  border: none;
+  border-radius: 10px;
+  padding: 0.95rem 1.15rem;
+  font-weight: 700;
+  background: #ff9f00;
+  color: #111827;
+}
+
+.buyNowButton:disabled {
+  opacity: 0.7;
+}
+
+.purchasePanel {
+  align-content: start;
+  padding: 0.25rem 0.25rem 0.5rem;
+}
+
+.productMeta {
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.titleBlock h1 {
+  font-size: clamp(1.9rem, 4vw, 2.8rem);
+}
+
+.priceRowMain {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.priceRowMain strong {
+  font-size: clamp(2rem, 4vw, 2.7rem);
+  color: #0f172a;
+}
+
+.originalPriceInline {
+  color: #94a3b8;
+  font-size: 1rem;
+  text-decoration: line-through;
+}
+
+.offerText {
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+.deliveryCard {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1rem;
+  border-radius: 22px;
+  background: rgba(248, 250, 252, 0.96);
+}
+
+.deliveryCard strong,
+.highlightPanel h2,
+.infoSection h2 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.deliveryCard span,
+.infoSection p,
+.highlightList li {
+  color: #64748b;
+}
+
+.deliveryBadge {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.highlightList {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.specGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem;
+}
+
+.specCard {
+  display: grid;
+  gap: 0.3rem;
+  padding: 1rem;
+  border-radius: 20px;
+  background: rgba(15, 23, 42, 0.04);
+}
+
+.specCard strong {
+  font-size: 1rem;
+  color: #0f172a;
+}
+
+.specCard span {
+  color: #64748b;
+  font-size: 0.82rem;
+}
+
+.detailInfoCard {
+  padding: 1rem;
+}
+
+.mobileStickyBar {
+  display: none;
+}
+
+.infoTabs {
+  display: flex;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.infoTab,
+.infoTabActive {
+  display: inline-flex;
+  padding: 0.55rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.infoTab {
+  background: rgba(15, 23, 42, 0.06);
+  color: #64748b;
+}
+
+.infoTabActive {
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+}
+
+.infoSection p {
+  margin: 0;
+  line-height: 1.7;
+}
+
+@media (max-width: 480px) {
+  .detailPage {
+    gap: 1rem;
+    padding-bottom: 6.8rem;
+  }
+
+  .productShowcase,
+  .detailInfoCard {
+    padding: 0.85rem;
+    border-radius: 24px;
+  }
+
+  .previewWrap {
+    min-height: 420px;
+    padding: 0.35rem;
+    border-radius: 28px;
+    background: #ffffff;
+    box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.06);
+  }
+
+  .previewWrap img {
+    width: 100%;
+    max-width: none;
+    max-height: none;
+  }
+
+  .thumbnailRail {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .galleryActions {
+    display: none;
+  }
+
+  .mobileSelectionCard {
+    display: grid;
+  }
+
+  .titleBlock h1 {
+    font-size: 1.45rem;
+  }
+
+  .priceRowMain strong {
+    font-size: 1.8rem;
+  }
+
+  .infoTabs {
+    gap: 0.45rem;
+  }
+
+  .mobileStickyBar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: grid;
+    grid-template-columns: 1fr 1.15fr;
+    gap: 0.75rem;
+    padding: 0.8rem 0.8rem calc(0.8rem + env(safe-area-inset-bottom, 0px));
+    background: rgba(255, 255, 255, 0.98);
+    border-top: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: 0 -18px 36px rgba(15, 23, 42, 0.12);
+    z-index: 35;
+  }
+
+  .mobileStickyPrimary,
+  .mobileStickySecondary {
+    min-height: 56px;
+    border: none;
+    border-radius: 18px;
+    padding: 0 1rem;
+    font-weight: 800;
+  }
+
+  .mobileStickySecondary {
+    background: #ffffff;
+    color: #111827;
+    box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.14);
+  }
+
+  .mobileStickyPrimary {
+    background: #ffd400;
+    color: #111827;
+  }
+}
+
 .sellerGrid {
   display: grid;
   gap: 1.25rem;
@@ -351,6 +702,50 @@
 
 .createCard {
   padding: 1.5rem;
+}
+
+@media (min-width: 720px) {
+  .productShowcase {
+    padding: 1.25rem;
+  }
+
+  .thumbnailRail {
+    grid-template-columns: repeat(5, minmax(74px, 84px));
+    justify-content: start;
+  }
+
+  .galleryActions,
+  .specGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .infoContent {
+    grid-template-columns: 1.35fr 0.85fr;
+    gap: 1.5rem;
+  }
+
+  .mobileSelectionCard,
+  .mobileStickyBar {
+    display: none;
+  }
+}
+
+@media (min-width: 980px) {
+  .productShowcase {
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    align-items: start;
+    gap: 1.75rem;
+    padding: 1.5rem;
+  }
+
+  .galleryPanel {
+    position: sticky;
+    top: 6.75rem;
+  }
+
+  .previewWrap {
+    min-height: 520px;
+  }
 }
 
 @media (max-width: 1080px) {

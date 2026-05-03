@@ -35,6 +35,7 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 button,
@@ -104,12 +105,13 @@ textarea {
   background-image: url('/ui/market-motif.svg');
   background-repeat: no-repeat;
   background-position: right -60px top 120px;
+  background-size: min(440px, 42vw);
 }
 
 .pageShell {
-  width: min(1400px, calc(100% - 2rem));
+  width: min(1400px, calc(100% - 1rem));
   margin: 0 auto;
-  padding: 1.25rem 0 3rem;
+  padding: 0.9rem 0 7rem;
 }
 
 .pageState {
@@ -132,9 +134,16 @@ textarea {
   }
 }
 
-@media (max-width: 640px) {
+@media (min-width: 641px) {
   .pageShell {
-    width: min(100% - 1rem, 1400px);
-    padding-top: 1.25rem;
+    width: min(1400px, calc(100% - 1.5rem));
+    padding: 1.15rem 0 7rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .pageShell {
+    width: min(1400px, calc(100% - 2rem));
+    padding: 1.25rem 0 2.5rem;
   }
 }

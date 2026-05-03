@@ -196,6 +196,28 @@
     linear-gradient(90deg, rgba(226, 232, 240, 0.6), rgba(255, 255, 255, 0.95), rgba(226, 232, 240, 0.6));
 }
 
+@media (max-width: 560px) {
+  .header,
+  .layout,
+  .summaryCard,
+  .itemCard {
+    padding: 1rem;
+  }
+
+  .header h1 {
+    font-size: 1.45rem;
+  }
+
+  .qtyControl {
+    gap: 0.45rem;
+  }
+
+  .primaryButton,
+  .ghostButton {
+    width: 100%;
+  }
+}
+
 @media (max-width: 1000px) {
   .layout {
     grid-template-columns: 1fr;

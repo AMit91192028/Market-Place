@@ -4,9 +4,10 @@ import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../auth/hooks/useAuth'
 import { getCart } from '../../../services/api/cartApi'
+import { getStoredAuthToken } from '../../../services/api/createServiceClient'
 import styles from '../styles/AiBuddyChat.module.css'
 
-const DEFAULT_SOCKET_SERVER_URL = 'http://localhost:3005'
+const DEFAULT_SOCKET_BASE = '/api/socket'
 const DEFAULT_SOCKET_PATH = '/api/socket/socket.io'
 
 function trimTrailingSlash(value = '') {
@@ -18,7 +19,7 @@ function resolveSocketConfig(rawUrl) {
 
   if (!configuredUrl) {
     return {
-      serverUrl: DEFAULT_SOCKET_SERVER_URL,
+      serverUrl: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:5173',
       path: DEFAULT_SOCKET_PATH,
     }
   }
@@ -47,7 +48,7 @@ function resolveSocketConfig(rawUrl) {
 }
 
 const { serverUrl: SOCKET_SERVER_URL, path: SOCKET_PATH } = resolveSocketConfig(
-  import.meta.env.VITE_AI_BUDDY_URL
+  import.meta.env.VITE_AI_BUDDY_URL || DEFAULT_SOCKET_BASE
 )
 
 const SUGGESTIONS = [
@@ -90,19 +91,21 @@ export default function AiBuddyChat() {
   const canUseAssistant = authChecked && isAuthenticated && role === 'user'
   const needsSignIn = authChecked && !isAuthenticated
   const isUnsupportedRole = authChecked && isAuthenticated && role !== 'user'
+  const displayStatus = !isOpen || !canUseAssistant ? (canUseAssistant ? 'idle' : 'offline') : status
+  const replyPending = isAuthenticated ? isWaitingForReply : false
 
   useEffect(() => {
     if (!isOpen || !canUseAssistant) {
-      setStatus(canUseAssistant ? 'idle' : 'offline')
       return undefined
     }
-
-    setStatus('connecting')
 
     const socket = io(SOCKET_SERVER_URL, {
       path: SOCKET_PATH,
       withCredentials: true,
-      transports: ['websocket', 'polling'],
+      auth: {
+        token: getStoredAuthToken(),
+      },
+      transports: ['websocket'],
     })
 
     socketRef.current = socket
@@ -144,18 +147,12 @@ export default function AiBuddyChat() {
     if (bodyRef.current) {
       bodyRef.current.scrollTop = bodyRef.current.scrollHeight
     }
-  }, [messages, isWaitingForReply])
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      setIsWaitingForReply(false)
-    }
-  }, [isAuthenticated])
+  }, [messages, replyPending])
 
   function sendMessage(content) {
     const trimmed = content.trim()
 
-    if (!trimmed || !socketRef.current || status !== 'connected') {
+    if (!trimmed || !socketRef.current || displayStatus !== 'connected') {
       return
     }
 
@@ -183,18 +180,18 @@ export default function AiBuddyChat() {
             <div className={styles.headerActions}>
               <span
                 className={`${styles.statusPill} ${
-                  status === 'connected'
+                  displayStatus === 'connected'
                     ? styles.connected
-                    : status === 'connecting'
+                    : displayStatus === 'connecting'
                       ? styles.connecting
                       : styles.offline
                 }`}
               >
-                {status === 'connected'
+                {displayStatus === 'connected'
                   ? 'Live'
-                  : status === 'connecting'
+                  : displayStatus === 'connecting'
                     ? 'Connecting'
-                    : status === 'error'
+                    : displayStatus === 'error'
                       ? 'Retry needed'
                       : 'Offline'}
               </span>
@@ -243,7 +240,7 @@ export default function AiBuddyChat() {
                       type="button"
                       className={styles.suggestionChip}
                       onClick={() => sendMessage(suggestion)}
-                      disabled={status !== 'connected' || isWaitingForReply}
+                      disabled={displayStatus !== 'connected' || replyPending}
                     >
                       {suggestion}
                     </button>
@@ -265,7 +262,7 @@ export default function AiBuddyChat() {
                     </article>
                   ))}
 
-                  {isWaitingForReply ? (
+                  {replyPending ? (
                     <article className={`${styles.messageBubble} ${styles.assistantBubble}`}>
                       <span className={styles.messageLabel}>AI Buddy</span>
                       <div className={styles.typingDots} aria-label="AI Buddy is typing">
@@ -285,10 +282,10 @@ export default function AiBuddyChat() {
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
               placeholder="Ask AI Buddy to find a product or add one to your cart"
-              disabled={!canUseAssistant || isWaitingForReply}
+              disabled={!canUseAssistant || replyPending}
               rows={2}
             />
-            <button type="submit" className={styles.sendButton} disabled={!draft.trim() || !canUseAssistant || isWaitingForReply}>
+            <button type="submit" className={styles.sendButton} disabled={!draft.trim() || !canUseAssistant || replyPending}>
               Send
             </button>
           </form>
@@ -297,7 +294,10 @@ export default function AiBuddyChat() {
         <button
           type="button"
           className={styles.launcher}
-          onClick={() => setIsOpen(true)}
+          onClick={() => {
+            setStatus('connecting')
+            setIsOpen(true)
+          }}
           aria-expanded={false}
           aria-controls="ai-buddy-panel"
         >

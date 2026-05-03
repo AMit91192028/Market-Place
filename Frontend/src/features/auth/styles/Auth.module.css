@@ -1,35 +1,80 @@
 .authLayout {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 1.5rem;
+  gap: 1rem;
   align-items: stretch;
+  width: min(100%, 1040px);
+  margin: 0 auto;
 }
 
-.authPanel,
+.brandPanel,
 .formCard {
+  position: relative;
+  overflow: hidden;
   background: #ffffff;
   border: 1px solid rgba(15, 23, 42, 0.1);
-  border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-  padding: 2rem;
+  border-radius: 28px;
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.08);
 }
 
-.authPanel {
-  background: linear-gradient(145deg, #0f172a, #1e3a8a);
-  color: #f8fafc;
+.brandPanel {
+  display: none;
+  min-height: 240px;
+  background:
+    radial-gradient(circle at top left, rgba(96, 165, 250, 0.28), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.32), transparent 26%),
+    linear-gradient(145deg, #1d4ed8, #17317b);
+  color: #eff6ff;
+}
+
+.brandPanel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.08), transparent 32%),
+    repeating-linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.04) 0,
+      rgba(255, 255, 255, 0.04) 2px,
+      transparent 2px,
+      transparent 18px
+    );
+  pointer-events: none;
+}
+
+.brandContent,
+.formHeader,
+.form {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.brandContent {
+  position: relative;
+  z-index: 1;
+  padding: 1.35rem;
+  align-content: center;
+  justify-items: center;
+  text-align: center;
+  min-height: 100%;
 }
 
 .eyebrow,
 .badge {
   display: inline-flex;
+  width: fit-content;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.45rem 0.8rem;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.12);
-  font-size: 0.8rem;
-  letter-spacing: 0.06em;
+  padding: 0.5rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.eyebrow {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
 }
 
 .badge {
@@ -37,107 +82,241 @@
   color: #1d4ed8;
 }
 
-.authPanel h1,
+.brandMark {
+  display: grid;
+  place-items: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
 .formHeader h2 {
+  margin: 0;
   font-family: 'Inter', 'Segoe UI', sans-serif;
   font-weight: 800;
-  line-height: 1.05;
-  margin: 1rem 0;
+  line-height: 1.02;
 }
 
-.authPanel h1 {
-  font-size: clamp(2.2rem, 3vw, 4rem);
+.brandContent p {
+  max-width: 18rem;
+  margin: 0;
+  color: rgba(239, 246, 255, 0.88);
+  font-size: 0.92rem;
+  line-height: 1.55;
 }
 
-.authPanel p,
-.formHeader p,
-.featureCard span {
-  color: rgba(255, 255, 255, 0.82);
+.brandTitle {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-size: clamp(2.35rem, 4vw, 3.2rem);
+  font-weight: 800;
+  line-height: 1;
+  color: #ffffff;
+}
+
+.brandSubline {
+  color: rgba(239, 246, 255, 0.84);
+  font-size: 0.86rem;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.formCard {
+  display: grid;
+  align-items: center;
+  padding: 1.5rem;
+}
+
+.formCardInner {
+  width: min(100%, 100%);
+}
+
+.formCardInnerWide {
+  width: min(100%, 100%);
+}
+
+.formHeader h2 {
+  font-size: clamp(1.7rem, 5vw, 2.4rem);
+  color: #0f172a;
 }
 
 .formHeader p,
 .footerCopy {
+  margin: 0;
   color: #64748b;
-}
-
-.featureList {
-  display: grid;
-  gap: 1rem;
-  margin-top: 2rem;
-}
-
-.featureCard {
-  display: grid;
-  gap: 0.4rem;
-  padding: 1rem;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.formHeader {
-  display: grid;
-  gap: 0.5rem;
+  line-height: 1.55;
 }
 
 .form {
-  display: grid;
-  gap: 1rem;
-  margin-top: 1.5rem;
+  gap: 1.1rem;
+  margin-top: 1.4rem;
 }
 
 .field {
   display: grid;
-  gap: 0.5rem;
+  gap: 0.55rem;
 }
 
-.field span {
-  font-weight: 600;
+.field > span {
+  color: #0f172a;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  min-width: 0;
+  padding: 1rem 1.05rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 16px;
+  background: #f8fafc;
+  color: #0f172a;
+  font-size: 0.95rem;
+  outline: none;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: rgba(37, 99, 235, 0.5);
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
 }
 
 .field small {
   color: #b91c1c;
+  font-size: 0.78rem;
 }
 
 .gridTwo {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
 }
 
 .passwordRow {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 0.75rem;
+  gap: 0.7rem;
 }
 
 .inlineButton,
 .primaryButton {
   border: none;
-  border-radius: 10px;
+  border-radius: 16px;
   font-weight: 700;
 }
 
 .inlineButton {
-  padding: 0.9rem 1rem;
-  background: rgba(15, 23, 42, 0.08);
+  min-width: 4rem;
+  padding: 1rem 1.05rem;
+  background: rgba(15, 23, 42, 0.06);
+  color: #0f172a;
 }
 
 .primaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
   padding: 1rem 1.2rem;
   background: linear-gradient(135deg, #2563eb, #38bdf8);
-  color: #fff;
+  color: #ffffff;
+  box-shadow: 0 14px 28px rgba(37, 99, 235, 0.24);
+}
+
+.primaryButton:disabled,
+.inlineButton:disabled {
+  opacity: 0.7;
+}
+
+.sellerEntryActions {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1.4rem;
+}
+
+.roleGrid {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.roleCard {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.26);
+  border-radius: 18px;
+  background: #f8fafc;
+  cursor: pointer;
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.roleCard input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.roleCard strong {
+  color: #0f172a;
+  font-size: 0.96rem;
+}
+
+.roleCard small {
+  color: #64748b;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.roleCardActive {
+  border-color: rgba(37, 99, 235, 0.35);
+  background: rgba(239, 246, 255, 0.92);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+}
+
+.userDefaultNotice {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem;
+  border: 1px solid rgba(37, 99, 235, 0.16);
+  border-radius: 18px;
+  background: rgba(239, 246, 255, 0.88);
+}
+
+.userDefaultNotice strong {
+  color: #0f172a;
+  font-size: 0.96rem;
+}
+
+.userDefaultNotice small {
+  color: #475569;
+  font-size: 0.82rem;
+  line-height: 1.45;
 }
 
 .errorBox {
   margin-top: 1rem;
-  padding: 1rem;
-  border-radius: 20px;
+  padding: 0.95rem 1rem;
+  border-radius: 18px;
   background: rgba(185, 28, 28, 0.08);
   color: #991b1b;
 }
 
 .footerCopy {
-  margin-top: 1rem;
+  margin-top: 1.2rem;
 }
 
 .footerCopy a {
@@ -145,19 +324,61 @@
   font-weight: 700;
 }
 
-@media (max-width: 960px) {
+@media (min-width: 640px) {
   .authLayout {
-    grid-template-columns: 1fr;
+    gap: 1.25rem;
   }
 
-  .authPanel,
-  .formCard {
-    padding: 1.4rem;
+  .formCard,
+  .brandContent {
+    padding: 1.8rem;
+  }
+
+  .gridTwo,
+  .roleGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 640px) {
-  .gridTwo {
-    grid-template-columns: 1fr;
+@media (min-width: 960px) {
+  .authLayout {
+    grid-template-columns: minmax(320px, 0.92fr) minmax(420px, 1.08fr);
+    gap: 0;
+    overflow: hidden;
+    border-radius: 32px;
+    background: #ffffff;
+    box-shadow: 0 28px 70px rgba(15, 23, 42, 0.12);
+  }
+
+  .brandPanel {
+    display: block;
+    min-height: 680px;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+  }
+
+  .formCard {
+    padding: 2.2rem;
+    justify-items: center;
+  }
+
+  .brandContent {
+    padding: 2rem 1.8rem;
+  }
+
+  .formCard {
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+    border-left: 1px solid rgba(15, 23, 42, 0.08);
+  }
+
+  .formCardInner {
+    width: min(100%, 380px);
+  }
+
+  .formCardInnerWide {
+    width: min(100%, 460px);
   }
 }

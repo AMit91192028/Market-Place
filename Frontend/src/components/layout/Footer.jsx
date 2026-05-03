@@ -53,7 +53,7 @@ export default function Footer() {
       <div className={styles.bottom}>
         <span>&copy; {new Date().getFullYear()} Market Place. All rights reserved.</span>
         <div className={styles.bottomLinks}>
-          <Link to="/">Become a Seller</Link>
+          <Link to="/seller/access">Become a Seller</Link>
           <Link to="/">Advertise</Link>
           <Link to="/">Help Center</Link>
         </div>
